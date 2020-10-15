@@ -1,3 +1,2 @@
-﻿  matrixClass.cpp
-C:\Users\Alsu\source\repos\matrixClass\matrixClass\matrixClass.cpp(309,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+﻿  Matrix.cpp
   matrixClass.vcxproj -> C:\Users\Alsu\source\repos\matrixClass\Debug\matrixClass.exe
