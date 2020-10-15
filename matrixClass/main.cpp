@@ -26,7 +26,6 @@ int main()
 					
 		if (v == 2)
 			m->plus();
-	
 
 		if (v == 3)
 			m->minus();
@@ -43,9 +42,16 @@ int main()
 		if (v == 7)
 			m->pow();
 
-		
-			
+		if (v == 8)
+			m->areEqual();
+
+		if (v == 9)
+			m->checkType();		
+
+		//if (v == 10)
+			//exit(1);
 	}
+
 	return 0;
         
 }

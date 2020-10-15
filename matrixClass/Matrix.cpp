@@ -79,8 +79,8 @@ double** generate(int r, int c) {
 int menu()
 {
 
-	cout << "\nЧто вы хотите сделать?\n" << endl;
-	cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - Вычисление определителя \n9 - Транспонирование\n10 - Вычисление обратной матрицы\n" << endl;
+	cout << "\n\n\nЧто вы хотите сделать?\n" << endl;
+	cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - сравнение с другой матрицей (проверка на равенство)\n 9 - Вычисление определителя \n10 - Транспонирование\n11 - Вычисление обратной матрицы\n" << endl;
 
 	for (;;)
 	{
@@ -291,19 +291,20 @@ void Matrix::times() {
 
 	Matrix* m2 = new Matrix(col, ans);
 	cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
+
 	cout << "Ваш выбор: ";
 	cin >> ans;
 	cout << "\n";
 
 	switch (ans) {
 	case 1:
-		m2->matrix_array = create(row, col);
+		m2->matrix_array = create(m2->row, m2->col);
 		break;
 	case 2:
-		m2->matrix_array = generate(row, col);
+		m2->matrix_array = generate(m2->row, m2->col);
 		break;
 	case 3:
-		m2->matrix_array = load(row, col);
+		m2->matrix_array = load(m2->row, m2->col);
 		break;
 	}
 	Matrix* m3 = new Matrix(this->row, m2->col);
@@ -412,37 +413,96 @@ void Matrix::divide_scal() {
 }
 
 void Matrix::pow() {
-	int pow = -1;
-	cout << "\nДля возведения матрицы в степень введите целое положительное число: ";
-	cin >> pow;
+	if (row != col) {
 
-	while (pow <= 0) {
-		cout << "\nВведите целое положительное число: ";
+		cout << "Возведение в степень доступно только для квадратных матриц\nВыберите другое действие или создайте новую матрицу\n";
+	}
+	else {
+
+		int pow = -1;
+		cout << "\nДля возведения матрицы в степень введите целое положительное число: ";
 		cin >> pow;
-	}
-	Matrix* m3 = new Matrix(row, col);
-	m3->matrix_array = this->times(this);
-	//Matrix* m3 = this;
-	//Matrix* temp = new Matrix(row, col);
-	if (pow > 2) {
-		for (int p = 1; p < pow - 1; p++) {
 
-			m3->matrix_array = m3->times(this);
-
+		while (pow <= 0) {
+			cout << "\nВведите целое положительное число: ";
+			cin >> pow;
 		}
+		Matrix* m3 = new Matrix(row, col);
+		m3->matrix_array = this->times(this);
+		//Matrix* m3 = this;
+		//Matrix* temp = new Matrix(row, col);
+		if (pow > 2) {
+			for (int p = 1; p < pow - 1; p++) {
+
+				m3->matrix_array = m3->times(this);
+
+			}
+		}
+
+
+		cout << "\nИтак\n";
+		cout << "\nИсходная матрица: \n";
+		printMatrix(row, col, matrix_array);
+		cout << "\n\nРезультирующая матрица: \n";
+		printMatrix(row, col, m3->matrix_array);
+		chooseMatrix(*m3);
+
 	}
-
-
-	cout << "\nИтак\n";
-	cout << "\nИсходная матрица: \n";
-	printMatrix(row, col, matrix_array);
-	cout << "\n\nРезультирующая матрица: \n";
-	printMatrix(row, col, m3->matrix_array);
-	chooseMatrix(*m3);
-
 }
 
 
+void Matrix::areEqual() {
+	cout << "С какой матрицей вы хотите сравнить исходную матрицу?\n";
+	Matrix* m2 = new Matrix();
+	if (row != m2->row || col != m2->col) {
+		cout << "\nМатрицы не равны \n" << endl;
+		
+	}
+	else {
+		for (int i = 0; i < col; i++)
+			for (int j = 0; j < row; j++)
+			{
+				if (matrix_array[i][j] != m2->matrix_array[i][j])
+				{
+					cout << "\nМатрицы не равны \n" << endl;
+					return;
+				}
+			}
+
+		cout << "\nМатрицы равны \n" << endl;
+		
+	}
+}
+
+bool Matrix::areEqual(Matrix m2) {
+	
+	if (row != m2.row || col != m2.col) {
+		return false;
+	}
+	else {
+		for (int i = 0; i < col; i++)
+			for (int j = 0; j < row; j++)
+			{
+				if (matrix_array[i][j] != m2.matrix_array[i][j])
+				{
+					return false;
+				}
+			}
+
+		return true;
+	}
+}
+
+void Matrix::findDet() {
+	if (row != col) {
+
+		cout << "Поиск определителя доступен только для квадратных матриц\nВыберите другое действие или создайте новую матрицу\n";
+	}
+	else {
+
+
+	}
+}
 
 void Matrix::chooseMatrix(Matrix m3) {
 	cout << "\n\nС какой матрицей продолжаем работать?\n1 - исходная\n2 - результирующая\n" << endl;
@@ -471,4 +531,251 @@ void Matrix::chooseMatrix(Matrix m3) {
 
 	}
 	cout << "\nГотово!\n" << endl;
+}
+
+void Matrix::invertMatrix() {
+	if (row != col) {
+
+		cout << "Поиск определителя доступен только для квадратных матриц\nВыберите другое действие или создайте новую матрицу\n";
+	}
+	else {
+		Matrix* m3 = new Matrix(row, col);
+
+
+
+		// создание
+		double** matrix;
+
+		// создание
+		matrix = new double* [row];    // массив указателей
+		for (int i = 0; i < row; i++) {   //
+			matrix[i] = new double[col];     // инициализация указателей
+
+		}
+
+		for (int i = 0; i < row; i++) {
+			for (int j = 0; j < col; j++) {
+				if (i == j)
+					matrix[i][j] = 1;
+				else
+					matrix[i][j] = 0;
+			}
+		}
+
+		m3->matrix_array = matrix;
+
+
+		printMatrix(row, col, m3->matrix_array);
+		// converting matrix to e
+
+		
+		for (int i = 0; i < row; i++)
+
+		{
+
+			// normalizing row (making first element =1)
+
+			long double temp = matrix_array[i][0];
+
+			for (int j = row - 1; j >= 0; j--)
+
+			{
+
+				m3->matrix_array[i][j] /= temp;
+
+				matrix_array[i][j] /= temp;
+
+			}
+
+			// excluding i-th element from each row except i-th one
+
+			for (int j = 0; j < row; j++)
+
+				if (j != i)
+
+				{
+
+					temp = matrix_array[i][j];
+
+					for (int k = row - 1; k >= 0; k--)
+
+					{
+
+						m3->matrix_array[j][k] -= m3->matrix_array[i][k] * temp;
+
+						matrix_array[j][k] -= matrix_array[i][k] * temp;
+
+					}
+
+				}
+
+		}
+
+		cout << "\n";
+		printMatrix(row, col, m3->matrix_array);
+		cout << "\n";
+		printMatrix(row, col, matrix_array);
+
+
+	}
+}
+
+Matrix Matrix::transMatrix() {
+
+	Matrix* m3 = new Matrix(col, row);
+
+	for (int i = 0; i < col; i++)
+		for (int j = 0; j < row; j++)
+		{
+			m3->matrix_array[i][j] = matrix_array[j][i];
+		}
+	cout << "\n\nИсходная матрица: " << endl;
+	printMatrix(row, col, matrix_array);
+	cout << "\n\nТранспонированная матрица: " << endl;
+	printMatrix(m3->row, m3->col, m3->matrix_array);
+
+	chooseMatrix(*m3);
+
+	return *m3;
+	 
+}
+
+
+
+void Matrix::checkType() {
+
+	bool square = false; // квадратная
+	bool diagonal = true; // диагональная
+	bool empty = true; // нулевая 
+	bool identity = true; //единичная
+	bool symmetrical = false; // симметрическая 
+	bool upperTriangle = true; // верхняя треугольная
+	bool lowerTriangle = true; // нижняя треугольная
+	bool ordinary = true;
+
+	//проверка на квадратную матрицу
+	if (row == col)
+		square = true;
+
+	//проверка на диагональную матрицу, если находим ненулевой элемент вне главной диагонали - выходим из цикла
+
+	for (int i = 0; i < row; i++)
+	{
+		for (int j = 0; j < col; j++)
+		{
+			if (i != j && matrix_array[i][j] != 0)
+			{
+				diagonal = false;
+				empty = false;
+				break;
+			}
+		}
+
+		if (diagonal == false)
+			break;
+	}
+
+	//если матрица диагональная - дополнительная проверка на нулевую матрицу
+	if (diagonal == true) {
+		upperTriangle = true;
+		lowerTriangle = true;
+		
+		for (int i = 0; i < row; i++)
+		{
+			for (int j = 0; j < col; j++)
+			{
+				if (i == j && matrix_array[i][j] != 0)
+				{
+					empty = false;
+					break;
+				}
+			}
+
+			if (empty == false)
+				break;
+		}
+
+	}
+	// проверка на единичную матрицу
+	if (diagonal == true) {
+
+		for (int i = 0; i < row; i++)
+		{
+			for (int j = 0; j < col; j++)
+			{
+				if (i == j && matrix_array[i][j] != 1)
+				{
+					identity = false;
+					break;
+				}
+			}
+
+			if (identity == false)
+				break;
+		}
+	}
+
+	//проверка на симметрическую матрицу
+
+	if (this->areEqual(this->transMatrix())) //если исходная и транспонированная матрицы равны
+		symmetrical = true;
+	
+	// проверка на нижнюю треугольную матрицу 
+
+	if (square == true && diagonal == false) {
+
+		for (int i = 0; i < row; i++)
+		{
+			for (int j = 0; j < col; j++)
+			{
+				if (j> i && matrix_array[i][j]!=0) {
+					lowerTriangle = false;
+					break;
+
+				}
+			}
+
+			if(lowerTriangle == false)
+				break;
+		}
+
+	}
+
+	// проверка на верхнюю треугольную матрицу 
+
+	if (square == true && diagonal == false) {
+
+		for (int i = 0; i < row; i++)
+		{
+			for (int j = 0; j < col; j++)
+			{
+				if (j < i && matrix_array[i][j] != 0) {
+					upperTriangle = false;
+					break;
+
+				}
+			}
+
+			if (upperTriangle == false)
+				break;
+		}
+
+	}
+
+
+	if (square == true || diagonal == true || empty == true || identity == true || symmetrical == true || upperTriangle == true || lowerTriangle == true)
+		ordinary == false;
+
+	cout << "\n\nТип матрицы:\n";
+	if (square) cout << "Квадратная" << endl;
+	if (diagonal) cout << "Диагональная - " << endl;
+	if (empty) cout << "Нулевая - " << endl;
+	if (identity) cout << "Единичная - " << endl;
+	if (symmetrical) cout << "Симметрическая - " << endl;
+	if (upperTriangle) cout << "Верхняя треугольная" << endl;
+	if (lowerTriangle) cout << "Верхняя треугольная" << endl;
+	if (ordinary) cout << "Не принадлежит ни к одному из особых типов" << endl;
+
+	
+
 }

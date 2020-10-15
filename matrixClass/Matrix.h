@@ -32,7 +32,18 @@ public:
 	
 	void pow();
 
+	void areEqual();
+	bool areEqual(Matrix m3);
+
+	void findDet();
+
 	void chooseMatrix(Matrix m3);
+
+	void invertMatrix();
+	
+	Matrix transMatrix();
+
+	void checkType();
 
 };
 
