@@ -1,21 +1,26 @@
 #pragma once
 
 int menu();
-void printMatrix(int, int, double**);
-double** create(int, int);
-double** generate(int, int);
-double** load(int, int);
-
 
 class Matrix
 {
 
 public:
+	
 	int col;
 	int row;
 	double** matrix_array;
 
-	
+	void printMatrix(Matrix m);
+	void chooseMatrix(Matrix m3);
+
+	double** generate();
+	double** generate(int, int);
+
+	double** create();
+	double** create(int, int);
+
+	double** load();
 
 	Matrix();
 	Matrix(int r, int c);
@@ -36,12 +41,10 @@ public:
 	bool areEqual(Matrix m3);
 
 	void findDet();
-
-	void chooseMatrix(Matrix m3);
-
 	void invertMatrix();
 	
 	Matrix transMatrix();
+	Matrix transMatrix(Matrix m);
 
 	void checkType();
 

@@ -46,7 +46,14 @@ int main()
 			m->areEqual();
 
 		if (v == 9)
-			m->checkType();		
+			m->checkType();
+
+		if (v == 10)
+			m->transMatrix();
+
+		if (v == 0)
+			exit(1);
+
 
 		//if (v == 10)
 			//exit(1);

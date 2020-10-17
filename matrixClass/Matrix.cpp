@@ -7,98 +7,129 @@
 
 using namespace std;
 int v = 0;
+bool matrixExists = false;
+
+/*Функция, реализующая меню. 
+При первом вызове предлагает создать матрицу и вызывает конструктор.
+При последующих становятся доступны другие действия, в т.ч. выход из программы или выбор новой матрицы*/
+
+int menu()
+{
+	if (matrixExists) {
+		cout << "\n\nЧто вы хотите сделать?\n" << endl;
+		cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - сравнение с другой матрицей (проверка на равенство)\n 9 - Проверка типа матрицы \n10 - Транспонирование\n11 - Вычисление обратной матрицы\n12 - Вычисление детерминанта\n\n13 - Сохранить матрицу в файл\n\n0 - Выйти" << endl;
+
+		for (;;)
+		{
+			cout << "\nВаш выбор: ";
+			cin >> v;
+			cout << "\n";
+
+			if (v < 0 || v > 13) {
+				cout << "\nПожалуйста, введите числа от 0 до 13.\n\n" << endl;
+				continue;
+			}
+
+			return v;
+		}
+	}
+	else {
+		cout << "Добро пожаловать в программу! Нажмите enter, чтобы добавить новую матрицу" << endl;
+		v = 1;
+		cin.get();
+		matrixExists = true;
+		return v;
+
+	}
+}
+/*Функция, печатающая принимаемую матрицу
+Она получает доступ к полям объекта m и проходит по двум циклам, поэлементно печатая матрицу*/
+
+void Matrix::printMatrix(Matrix m) {
 
 
-void printMatrix(int r, int c, double** matrix) {
-
-
-	for (int i = 0; i < r; i++) {
+	for (int i = 0; i < m.row; i++) {
 		{
 			cout << "\n";
-			for (int j = 0; j < c; j++) {
-				cout << matrix[i][j] << " ";
+			for (int j = 0; j < m.col; j++) {
+				cout << m.matrix_array[i][j] << " ";
 			}
 		}
 	}
 }
 
-double** load(int r, int c) {
-	cout << "\nЗагружаю матрицу из файла..." << endl;
+/*Функция для выбора основной матрицы. 
+После операций можно выбрать, с какой матрицей продолжать работать, - результирующей или исходной.
+Если выбираем исходную, ничего не меняется. 
+При выборе результирующей - меняем поля матрицы m и переписываем массив matrix_array*/
 
-	double** matrix;
+void Matrix::chooseMatrix(Matrix m3) {
+	cout << "\n\nС какой матрицей продолжаем работать?\n1 - исходная\n2 - результирующая\n" << endl;
+	int ans;
+	cin >> ans;
 
-	// создание
-	matrix = new double* [r];    // массив указателей
-	for (int i = 0; i < r; i++) {   //
-		matrix[i] = new double[c];     // инициализация указателей
+	if (ans == 2) {
+		row = m3.row;
+		col = m3.col;
+		delete[] matrix_array;
 
-	}
+		matrix_array = new double* [row];    // массив указателей
+		for (int i = 0; i < row; i++) {   //
+			matrix_array[i] = new double[col];     // инициализация указателей
 
-	//Создаем файловый поток и связываем его с файлом
-	ifstream in("input.txt");
+		}
 
-	if (in.is_open())
-	{
-		//Если открытие файла прошло успешно
-		//Считаем матрицу из файла
-		for (int i = 0; i < r; i++)
-			for (int j = 0; j < c; j++)
-				in >> matrix[i][j];
-	}
-
-
-	return matrix;
-
-}
-
-double** generate(int r, int c) {
-
-	double** matrix;
-
-	// создание
-	matrix = new double* [r];    // массив указателей
-	for (int i = 0; i < r; i++) {   //
-		matrix[i] = new double[c];     // инициализация указателей
-
-	}
-
-	for (int i = 0; i < r; i++)   //строки массива
-	{
-		for (int j = 0; j < c; j++)   //столбцы массива
+		for (int i = 0; i < row; i++)   //строки массива
 		{
-			matrix[i][j] = 1 + rand() % 9;  //заполняем текущую ячейку
+			for (int j = 0; j < col; j++)   //столбцы массива
+			{
+				matrix_array[i][j] = m3.matrix_array[i][j];  //заполняем текущую ячейку
 
+			}
+		}
+
+	}
+	cout << "\nГотово!\n" << endl;
+}
+
+/*Функция для ручного ввода матрицы с клавиатуры
+Первый вариант - с выбором количества строк и столбцов матрицы*/
+
+double** Matrix::create()
+
+{
+	cout << "\nВведите количество строк и столбцов вашей новой матрицы: ";
+
+	cin >> row;
+	cin >> col;
+
+	this->row = row;
+	this->col = col;
+
+	double** matrix;
+
+	// создание
+	matrix = new double* [row];    // массив указателей
+	for (int i = 0; i < row; i++) {   //
+		matrix[i] = new double[col];     // инициализация указателей
+
+	}
+
+	for (int i = 0; i < row; i++) {
+		cout << "Вводим " << i + 1 << " строку: ";
+		for (int j = 0; j < col; j++) {
+			cin >> matrix[i][j];
 		}
 	}
 
 	return matrix;
 
-
 }
 
-int menu()
-{
+/*Функция для ручного ввода матрицы с клавиатуры
+Второй вариант - если количество строк и столбцов уже определены выбранными операциями*/
 
-	cout << "\n\n\nЧто вы хотите сделать?\n" << endl;
-	cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - сравнение с другой матрицей (проверка на равенство)\n 9 - Вычисление определителя \n10 - Транспонирование\n11 - Вычисление обратной матрицы\n" << endl;
-
-	for (;;)
-	{
-		cout << "\nВаш выбор: ";
-		cin >> v;
-		cout << "\n";
-
-		if (v <= 0 || v > 10) {
-			cout << "\nПожалуйста, введите числа от 1 до 10.\n\n" << endl;
-			continue;
-		}
-
-		return v;
-	}
-}
-
-
-double** create(int r, int c)
+double** Matrix::create(int r, int c)
 
 {
 	double** matrix;
@@ -123,13 +154,155 @@ double** create(int r, int c)
 
 }
 
-//методы
+/*Функция для рандомного автозаполнения матрицы
+Первый вариант - с выбором количества строк и столбцов матрицы*/
 
-Matrix::Matrix() {
+double** Matrix::generate() {
+
 	cout << "\nВведите количество строк и столбцов вашей новой матрицы: ";
 
 	cin >> row;
 	cin >> col;
+
+	this->row = row;
+	this->col = col;
+
+	double** matrix;
+
+	// создание
+	matrix = new double* [row];    // массив указателей
+	for (int i = 0; i < row; i++) {   //
+		matrix[i] = new double[col];     // инициализация указателей
+
+	}
+
+	for (int i = 0; i < row; i++)   //строки массива
+	{
+		for (int j = 0; j < col; j++)   //столбцы массива
+		{
+			matrix[i][j] = 1 + rand() % 9;  //заполняем текущую ячейку
+
+		}
+	}
+
+	return matrix;
+
+
+}
+
+/*Функция для рандомного автозаполнения матрицы
+Второй вариант - если количество строк и столбцов уже определены выбранными операциями*/
+
+double** Matrix::generate(int r, int c) {
+
+
+	double** matrix;
+
+	// создание
+	matrix = new double* [r];    // массив указателей
+	for (int i = 0; i < r; i++) {   //
+		matrix[i] = new double[c];     // инициализация указателей
+
+	}
+
+	for (int i = 0; i < r; i++)   //строки массива
+	{
+		for (int j = 0; j < c; j++)   //столбцы массива
+		{
+			matrix[i][j] = 1 + rand() % 9;  //заполняем текущую ячейку
+
+		}
+	}
+
+	return matrix;
+
+
+}
+
+/*Функция для считывания матрицы из файла
+Чтобы определить число строк и столбцов, 
+считаем количество чисел в файле и количество пробелов на одной строке. 
+
+Допущение - между числами матрицы ровно по одному пробелу, в конце каждой строки лишнего пробела нет.
+
+*/
+
+double** Matrix::load() {
+	cout << "\nЗагружаю матрицу из файла..." << endl;
+
+
+	//Создаем файловый поток и связываем его с файлом
+	ifstream in("input.txt");
+
+
+	int count = 0;// число чисел в файле
+	int temp;//Временная переменная
+
+
+	while (!in.eof())// пробегаем пока не встретим конец файла eof
+	{
+		in >> temp;//в пустоту считываем из файла числа
+		count++;// увеличиваем счетчик числа чисел
+	}
+
+
+	//Вначале переведем каретку в потоке в начало файла
+	in.seekg(0, ios::beg);
+	in.clear();
+
+	//Число пробелов в первой строчке вначале равно 0
+	int count_space = 0;
+	char symbol;
+	while (!in.eof())//на всякий случай цикл ограничиваем концом файла
+	{
+		//теперь нам нужно считывать не числа, а посимвольно считывать данные
+		in.get(symbol);//считали текущий символ
+		if (symbol == ' ') count_space++;//Если это пробел, то число пробелов увеличиваем
+		if (symbol == '\n') break;//Если дошли до конца строки, то выходим из цикла
+	}
+
+
+	//Опять переходим в потоке в начало файла
+	in.seekg(0, ios::beg);
+	in.clear();
+
+	//Теперь мы знаем сколько чисел в файле и сколько пробелов в первой строк
+
+	col = count_space + 1; //чисел в одной строке
+	row = count / col; //всего строк
+
+	double** matrix;
+
+	// создание
+	matrix = new double* [row];    // массив указателей
+	for (int i = 0; i < row; i++) {   //
+		matrix[i] = new double[col];     // инициализация указателей
+
+	}
+
+	if (in.is_open())
+	{
+		//Если открытие файла прошло успешно
+		//Считаем матрицу из файла
+		for (int i = 0; i < row; i++)
+			for (int j = 0; j < col; j++)
+				in >> matrix[i][j];
+	}
+
+
+	return matrix;
+
+}
+
+
+/*Конструктор 1 
+Предоставляет три варианта заполнения матрицы. 
+После выбора вызываются соответствующие методы.
+Если конструктор был вызван из меню пунктом 1) (добавить новую матрицу), выводится сообщение и печатается матрица.
+*/
+
+Matrix::Matrix() {
+	
 	cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
 	int ans;
 	cout << "Ваш выбор: ";
@@ -137,22 +310,30 @@ Matrix::Matrix() {
 	cout << "\n";
 	switch (ans) {
 	case 1:
-		matrix_array = create(row, col);
+		matrix_array = create();
 		break;
 	case 2:
-		matrix_array = generate(row, col);
+		matrix_array = generate();
 		break;
 	case 3:
-		matrix_array = load(row, col);
+		matrix_array = load();
 		break;
 	}
 	if (v == 1)
 	{
 		cout << "\nВаша новая матрица: \n" << endl;
-		printMatrix(row, col, matrix_array);
+		printMatrix(*this);
 	}
 }
 
+/*Конструктор 2
+"Тихое" создание новых объектов с известным числом строк и столбцов 
+
+Используется для создания результирующих матриц (для записи суммы, произведения и тд).
+
+Массив этого объекта потом заполняется в соответствующем методе.
+
+*/
 Matrix::Matrix(int r, int c) {
 	row = r;
 	col = c;
@@ -174,8 +355,12 @@ Matrix::Matrix(int r, int c) {
 	matrix_array = matrix;
 }
 
+/*Конструктор копирования
 
-//конструктор копирования:
+Копирует все поля выбранного объекта. 
+Хотела использовать его для возведения в степень, но передумала
+
+*/
 
 Matrix::Matrix(const Matrix& m) {
 	row = m.row;
@@ -197,6 +382,20 @@ Matrix::Matrix(const Matrix& m) {
 
 }
 
+/*Сложение матрицы
+
+Создается новый объект m2, для которого вызывается "тихий конструктор". 
+Число столбцов и строк новой матрицы совпадают с исходными.
+
+Далее уже созданный массив матрицы на выбор заполняется вручную, генерацией или загрузкой из файла.
+Если матрица из файла не подходит для сложения, программа просит выбрать другой способ.
+
+Потом "тихим конструктором" создается результирующая матрица. Заполняется внутри цикла.
+
+В конце можно выбрать, с какой матрицей продолжать работать дальше - исходной или результирующей.
+
+*/
+
 void Matrix::plus() {
 	cout << "Необходимо создать новый объект для действий с другой матрицей.\nУчтите, что количество строк и столбцов матриц должны совпадать.\n" << endl;
 	Matrix* m2 = new Matrix(row, col);
@@ -214,16 +413,16 @@ void Matrix::plus() {
 		m2->matrix_array = generate(row, col);
 		break;
 	case 3:
-		m2->matrix_array = load(row, col);
+		m2->matrix_array = load();
 		break;
 	}
 
 
 	cout << "\nИтак:\n";
 	cout << "\nПервое слагаемое: \n";
-	printMatrix(row, col, matrix_array);
+	printMatrix(*this);
 	cout << "\n\nВторое слагаемое: \n";
-	printMatrix(row, col, m2->matrix_array);
+	printMatrix(*m2);
 
 	Matrix* m3 = new Matrix(row, col);
 	for (int i = 0; i < row; i++)   //строки массива
@@ -235,11 +434,16 @@ void Matrix::plus() {
 		}
 	}
 	cout << "\n\nСумма: \n";
-	printMatrix(row, col, m3->matrix_array);
+	printMatrix(*m3);
 	chooseMatrix(*m3);
 
 }
 
+/*Вычитание матрицы
+
+Полная аналогия со сложением
+
+*/
 void Matrix::minus() {
 	cout << "\nНеобходимо создать новый объект для действий с другой матрицей.\nУчтите, что количество строк и столбцов матриц должны совпадать.\n" << endl;
 	Matrix* m2 = new Matrix(row, col);
@@ -257,15 +461,15 @@ void Matrix::minus() {
 		m2->matrix_array = generate(row, col);
 		break;
 	case 3:
-		m2->matrix_array = load(row, col);
+		m2->matrix_array = load();
 		break;
 	}
 
 	cout << "\nИтак:\n";
 	cout << "\nУменьшаемое: \n";
-	printMatrix(row, col, matrix_array);
+	printMatrix(*this);
 	cout << "\n\nВычитаемое: \n";
-	printMatrix(row, col, m2->matrix_array);
+	printMatrix(*m2);
 
 	Matrix* m3 = new Matrix(row, col);
 	for (int i = 0; i < row; i++)   //строки массива
@@ -278,9 +482,25 @@ void Matrix::minus() {
 	}
 
 	cout << "\n\nРазность: \n";
-	printMatrix(row, col, m3->matrix_array);
+	printMatrix(*m3);
 	chooseMatrix(*m3);
 }
+
+/*Умножение матрицы
+
+При умножении, количество строк новой матрицы должно совпадать с количеством столбцов исходной. 
+Поэтому программа запрашивает только количество столбцов второй матрицы.
+
+Создается новый объект m2, для которого вызывается "тихий конструктор".
+
+Далее уже созданный массив матрицы на выбор заполняется вручную, генерацией или загрузкой из файла.
+Если матрица из файла не подходит для сложения, программа просит выбрать другой способ.
+
+Потом "тихим конструктором" создается результирующая матрица. Заполняется внутри цикла.
+
+В конце можно выбрать, с какой матрицей продолжать работать дальше - исходной или результирующей.
+
+*/
 
 void Matrix::times() {
 	cout << "\nНеобходимо создать новый объект для действий с другой матрицей.\nУчтите, что количество строк новой матрицы должно совпадать с количеством столбцов исходной.\n" << endl;
@@ -304,16 +524,16 @@ void Matrix::times() {
 		m2->matrix_array = generate(m2->row, m2->col);
 		break;
 	case 3:
-		m2->matrix_array = load(m2->row, m2->col);
+		m2->matrix_array = load();
 		break;
 	}
 	Matrix* m3 = new Matrix(this->row, m2->col);
 	cout << "\n";
 	cout << "\nИтак\n";
 	cout << "\nПервый множитель: \n";
-	printMatrix(row, col, matrix_array);
+	printMatrix(*this);
 	cout << "\n\nВторой множитель: \n";
-	printMatrix(m2->row, m2->col, m2->matrix_array);
+	printMatrix(*m2);
 	for (int i = 0; i < this->row; i++)
 	{
 
@@ -332,10 +552,19 @@ void Matrix::times() {
 	}
 
 	cout << "\n\nПроизведение: \n";
-	printMatrix(m3->row, m3->col, m3->matrix_array);
+	printMatrix(*m3);
 	chooseMatrix(*m3);
 }
 
+/*
+
+Умножение матрицы 2
+
+Вспомогательная функция для метода возведения в степень
+
+Умножает объект на данную матрицу m2 и возвращает результирующий массив temp->matrix_array
+
+*/
 double** Matrix::times(Matrix* m2) {
 
 	Matrix* temp = new Matrix(row, col);
@@ -358,6 +587,12 @@ double** Matrix::times(Matrix* m2) {
 
 }
 
+/*Умножение матрицы на скаляр
+
+Поэлементно умножает матрицу на введенное с клавиатуры число. 
+Можно ввести проверку на недопустимые символы.
+
+*/
 void Matrix::times_scal() {
 	double scal;
 	cout << "\nДля умножения матрицы на скаляр, введите число: ";
@@ -374,14 +609,23 @@ void Matrix::times_scal() {
 	}
 	cout << "\nИтак\n";
 	cout << "\nИсходная матрица: \n";
-	printMatrix(row, col, matrix_array);
+	printMatrix(*this);
 	cout << "\nРезультирующая матрица: \n";
-	printMatrix(row, col, m3->matrix_array);
+	printMatrix(*m3);
 	chooseMatrix(*m3);
 
 
 
 }
+
+/*Деление матрицы на скаляр
+
+Поэлементно делит матрицу на введенное с клавиатуры число.
+Есть проверка на деление на ноль.
+
+Можно ввести проверку на недопустимые символы.
+
+*/
 
 void Matrix::divide_scal() {
 	double scal;
@@ -405,13 +649,25 @@ void Matrix::divide_scal() {
 	}
 	cout << "\nИтак\n";
 	cout << "\nИсходная матрица: \n";
-	printMatrix(row, col, matrix_array);
+	printMatrix(*this);
 	cout << "\nРезультирующая матрица: \n";
-	printMatrix(row, col, m3->matrix_array);
+	printMatrix(*m3);
 	chooseMatrix(*m3);
 
 }
 
+/*Возведение в степень
+
+Возведение в степень доступно только для квадратных матриц 
+-> есть проверка на вид матрицы с возвращением в меню.
+
+Есть проверка на вводимое число - оно должно быть целым и положительным.
+
+Тихо создаем результирующий объект m3. Заполняем его произведением матрицы на себя.
+Если степень = 2, возвращаем объект m3/
+Если степень больше 2, вызываем вспомогательную функцию умножения в цикле и сохраняем результирующие матрицы.
+
+*/
 void Matrix::pow() {
 	if (row != col) {
 
@@ -442,14 +698,23 @@ void Matrix::pow() {
 
 		cout << "\nИтак\n";
 		cout << "\nИсходная матрица: \n";
-		printMatrix(row, col, matrix_array);
+		printMatrix(*this);
 		cout << "\n\nРезультирующая матрица: \n";
-		printMatrix(row, col, m3->matrix_array);
+		printMatrix(*m3);
 		chooseMatrix(*m3);
 
 	}
 }
 
+/*Сравнение матриц 1 (для вызова из меню)
+
+Функция сравнивает объект с новой матрицей, которая создается первым конструктором. 
+
+Если число столбцов и строк матриц не равны, делаем вывод, что матрицы также не равны.
+Иначе сравниваем их поэлементно и выходим из функцие сразу, как только найдем неравные элементы.
+
+
+*/
 
 void Matrix::areEqual() {
 	cout << "С какой матрицей вы хотите сравнить исходную матрицу?\n";
@@ -473,6 +738,14 @@ void Matrix::areEqual() {
 		
 	}
 }
+
+/*Сравнение матриц 2
+Вспомогательная, "тихая функция"
+
+Точно так же сравнивает две матрицы, но ничего не выводит на экран, а просто возвращает булевое значение.
+Используется для определения типа матрицы.
+
+*/
 
 bool Matrix::areEqual(Matrix m2) {
 	
@@ -504,34 +777,7 @@ void Matrix::findDet() {
 	}
 }
 
-void Matrix::chooseMatrix(Matrix m3) {
-	cout << "\n\nС какой матрицей продолжаем работать?\n1 - исходная\n2 - результирующая\n" << endl;
-	int ans;
-	cin >> ans;
 
-	if (ans == 2) {
-		row = m3.row;
-		col = m3.col;
-		delete[] matrix_array;
-
-		matrix_array = new double* [row];    // массив указателей
-		for (int i = 0; i < row; i++) {   //
-			matrix_array[i] = new double[col];     // инициализация указателей
-
-		}
-
-		for (int i = 0; i < row; i++)   //строки массива
-		{
-			for (int j = 0; j < col; j++)   //столбцы массива
-			{
-				matrix_array[i][j] = m3.matrix_array[i][j];  //заполняем текущую ячейку
-
-			}
-		}
-
-	}
-	cout << "\nГотово!\n" << endl;
-}
 
 void Matrix::invertMatrix() {
 	if (row != col) {
@@ -565,7 +811,7 @@ void Matrix::invertMatrix() {
 		m3->matrix_array = matrix;
 
 
-		printMatrix(row, col, m3->matrix_array);
+		printMatrix(*m3);
 		// converting matrix to e
 
 		
@@ -612,13 +858,19 @@ void Matrix::invertMatrix() {
 		}
 
 		cout << "\n";
-		printMatrix(row, col, m3->matrix_array);
+		printMatrix(*m3);
 		cout << "\n";
-		printMatrix(row, col, matrix_array);
+		printMatrix(*this);
 
 
 	}
 }
+
+/*Транспонирование матрицы 1 (для вызова из меню)
+
+В строки новой матрицы записываются столбцы исходной.
+
+*/
 
 Matrix Matrix::transMatrix() {
 
@@ -630,9 +882,9 @@ Matrix Matrix::transMatrix() {
 			m3->matrix_array[i][j] = matrix_array[j][i];
 		}
 	cout << "\n\nИсходная матрица: " << endl;
-	printMatrix(row, col, matrix_array);
+	printMatrix(*this);
 	cout << "\n\nТранспонированная матрица: " << endl;
-	printMatrix(m3->row, m3->col, m3->matrix_array);
+	printMatrix(*m3);
 
 	chooseMatrix(*m3);
 
@@ -640,6 +892,35 @@ Matrix Matrix::transMatrix() {
 	 
 }
 
+/*Транспонирование матрицы 2 
+
+В строки новой матрицы записываются столбцы исходной.
+
+Ничего не выводится на экран, функция возвращает указатель на созданную матрицу.
+Используется при определении типа матрицы.
+
+*/
+
+Matrix Matrix::transMatrix(Matrix m) {
+
+	Matrix* m3 = new Matrix(m.col, m.row);
+
+	for (int i = 0; i < m.col; i++)
+		for (int j = 0; j < m.row; j++)
+		{
+			m3->matrix_array[i][j] = m.matrix_array[j][i];
+		}
+
+	return *m3;
+
+}
+
+/*
+
+Проверка типов матрицы
+(комментарии внутри функции)
+
+*/
 
 
 void Matrix::checkType() {
@@ -658,27 +939,48 @@ void Matrix::checkType() {
 		square = true;
 
 	//проверка на диагональную матрицу, если находим ненулевой элемент вне главной диагонали - выходим из цикла
-
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
+	if (square == true) {
+		for (int i = 0; i < row; i++)
 		{
-			if (i != j && matrix_array[i][j] != 0)
+			for (int j = 0; j < col; j++)
 			{
-				diagonal = false;
-				empty = false;
-				break;
+				if (i != j && matrix_array[i][j] != 0)
+				{
+					diagonal = false;
+					empty = false;
+					break;
+				}
 			}
+
+			if (diagonal == false)
+				break;
 		}
 
-		if (diagonal == false)
-			break;
 	}
+	else {
+		diagonal = false;
+		identity = false;
+		upperTriangle = false;
+		lowerTriangle = false;
 
+		for (int i = 0; i < row; i++)
+		{
+			for (int j = 0; j < col; j++)
+			{
+				if (matrix_array[i][j] != 0)
+				{
+					empty = false;
+					break;
+				}
+			}
+
+			if (empty == false)
+				break;
+		}
+
+	}
 	//если матрица диагональная - дополнительная проверка на нулевую матрицу
 	if (diagonal == true) {
-		upperTriangle = true;
-		lowerTriangle = true;
 		
 		for (int i = 0; i < row; i++)
 		{
@@ -695,6 +997,9 @@ void Matrix::checkType() {
 				break;
 		}
 
+	}
+	else {
+		identity = false;
 	}
 	// проверка на единичную матрицу
 	if (diagonal == true) {
@@ -717,7 +1022,7 @@ void Matrix::checkType() {
 
 	//проверка на симметрическую матрицу
 
-	if (this->areEqual(this->transMatrix())) //если исходная и транспонированная матрицы равны
+	if (this->areEqual(this->transMatrix(*this))) //если исходная и транспонированная матрицы равны
 		symmetrical = true;
 	
 	// проверка на нижнюю треугольную матрицу 
@@ -743,7 +1048,7 @@ void Matrix::checkType() {
 
 	// проверка на верхнюю треугольную матрицу 
 
-	if (square == true && diagonal == false) {
+	if (square == true && diagonal==false) {
 
 		for (int i = 0; i < row; i++)
 		{
@@ -764,18 +1069,16 @@ void Matrix::checkType() {
 
 
 	if (square == true || diagonal == true || empty == true || identity == true || symmetrical == true || upperTriangle == true || lowerTriangle == true)
-		ordinary == false;
+		ordinary = false;
 
-	cout << "\n\nТип матрицы:\n";
+	cout << "\n\nТип матрицы:\n\n";
 	if (square) cout << "Квадратная" << endl;
-	if (diagonal) cout << "Диагональная - " << endl;
-	if (empty) cout << "Нулевая - " << endl;
-	if (identity) cout << "Единичная - " << endl;
-	if (symmetrical) cout << "Симметрическая - " << endl;
+	if (diagonal) cout << "Диагональная" << endl;
+	if (empty) cout << "Нулевая" << endl;
+	if (identity) cout << "Единичная" << endl;
+	if (symmetrical) cout << "Симметрическая" << endl;
 	if (upperTriangle) cout << "Верхняя треугольная" << endl;
-	if (lowerTriangle) cout << "Верхняя треугольная" << endl;
+	if (lowerTriangle) cout << "Нижняя треугольная" << endl;
 	if (ordinary) cout << "Не принадлежит ни к одному из особых типов" << endl;
-
-	
 
 }
