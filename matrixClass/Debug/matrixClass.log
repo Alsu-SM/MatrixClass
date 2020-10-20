@@ -1,4 +1,3 @@
 ﻿  Matrix.cpp
-  main.cpp
-  Создание кода...
+C:\Users\Alsu\source\repos\matrixClass\matrixClass\Matrix.cpp(929): warning C4715: Matrix::findDet: значение возвращается не при всех путях выполнения
   matrixClass.vcxproj -> C:\Users\Alsu\source\repos\matrixClass\Debug\matrixClass.exe

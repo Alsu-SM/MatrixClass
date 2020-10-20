@@ -2,6 +2,9 @@
 
 int menu();
 
+
+
+
 class Matrix
 {
 
@@ -10,6 +13,8 @@ public:
 	int col;
 	int row;
 	double** matrix_array;
+
+	double** minorMatrix(int, int, Matrix);
 
 	void printMatrix(Matrix m);
 	void chooseMatrix(Matrix m3);
@@ -21,6 +26,7 @@ public:
 	double** create(int, int);
 
 	double** load();
+	void save();
 
 	Matrix();
 	Matrix(int r, int c);
@@ -32,15 +38,19 @@ public:
 	void times();
 	double** times(Matrix* m2);
 	void times_scal();
+	Matrix times_scal(double);
 
 	void divide_scal();
+	void divide_scal(double);
 	
 	void pow();
 
 	void areEqual();
 	bool areEqual(Matrix m3);
-
-	void findDet();
+	
+	void findNorm();
+	double findDet();
+	double findDet(int, double**);
 	void invertMatrix();
 	
 	Matrix transMatrix();

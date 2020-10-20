@@ -51,12 +51,19 @@ int main()
 		if (v == 10)
 			m->transMatrix();
 
+		if (v == 11)
+			m->findDet();
+
+		if (v == 12)
+			m->invertMatrix();
+
+		if (v == 13)
+			m->save();
+
 		if (v == 0)
 			exit(1);
 
 
-		//if (v == 10)
-			//exit(1);
 	}
 
 	return 0;

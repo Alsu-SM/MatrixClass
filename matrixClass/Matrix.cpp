@@ -1,6 +1,7 @@
 #include <iostream>
 #include<locale.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 #include <fstream>
 #include "Matrix.h"
@@ -8,6 +9,81 @@
 using namespace std;
 int v = 0;
 bool matrixExists = false;
+
+
+double **Matrix::minorMatrix(int r, int c, Matrix m) {
+	
+	int n = m.row - 1; // число строк и столбцов минора
+
+	double** minor_matrix_array = new double* [n];    // массив указателей
+	for (int i = 0; i < n; i++) {   //
+		minor_matrix_array[i] = new double[n];     // инициализация указателей
+
+	}
+	
+	int minor_i = 0, minor_j = 0;
+	
+	for (int i = 0; i < m.row; i++)
+	{
+		if (i == r) {
+			//i++;
+			continue;
+		}
+		for (int j = 0; j < m.col; j++)
+		{
+			if (j == c) {
+				//j++;
+				continue;
+			}
+
+			minor_matrix_array[minor_i][minor_j] = m.matrix_array[i][j];
+			//minor_i++;
+			minor_j++;
+			if (minor_j == n) {
+				minor_j = 0;
+				minor_i++;
+			}
+
+		}
+	}
+	/*	cout << "\n";
+
+	for (int i = 0; i < n; i++) {
+		{
+			cout << "\n";
+			for (int j = 0; j < n; j++) {
+				cout << minor_matrix_array[i][j] << " ";
+			}
+		}
+	}
+
+	cout << "\n";
+
+	*/
+
+
+	return minor_matrix_array;
+
+
+}
+
+void Matrix::save() {
+
+	ofstream in("output.txt");
+	if (in.is_open())
+	{
+		//Если открытие файла прошло успешно
+		//Считаем матрицу из файла
+		for (int i = 0; i < row; i++)
+		{
+			if (i>0)
+				in << "\n";
+			for (int j = 0; j < col; j++)
+				in << matrix_array[i][j] << " ";
+		}
+		cout << "Матрица успешно сохранена в файле \'output.txt\'" << endl;
+	}
+}
 
 /*Функция, реализующая меню. 
 При первом вызове предлагает создать матрицу и вызывает конструктор.
@@ -52,7 +128,9 @@ void Matrix::printMatrix(Matrix m) {
 		{
 			cout << "\n";
 			for (int j = 0; j < m.col; j++) {
-				cout << m.matrix_array[i][j] << " ";
+				
+					cout << m.matrix_array[i][j] << " ";
+				
 			}
 		}
 	}
@@ -303,7 +381,7 @@ double** Matrix::load() {
 
 Matrix::Matrix() {
 	
-	cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
+	cout << "Как вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
 	int ans;
 	cout << "Ваш выбор: ";
 	cin >> ans;
@@ -582,6 +660,14 @@ double** Matrix::times(Matrix* m2) {
 
 		}
 	}
+	for (int i = 0; i < temp->row; i++)
+	{
+		for (int j = 0; j < temp->col; j++)
+		{
+			if (abs(temp->matrix_array[i][j]) < 2.22045e-13)
+				temp->matrix_array[i][j] = 0;
+		}
+	}
 
 	return temp->matrix_array;
 
@@ -616,6 +702,22 @@ void Matrix::times_scal() {
 
 
 
+}
+
+Matrix Matrix::times_scal(double scal) {
+	
+	Matrix* m3 = new Matrix(row, col);
+	for (int i = 0; i < row; i++)   //строки массива
+	{
+		for (int j = 0; j < col; j++)   //столбцы массива
+		{
+			m3->matrix_array[i][j] = matrix_array[i][j] * scal;  //заполняем текущую ячейку
+
+		}
+	}
+
+	return *m3;
+	
 }
 
 /*Деление матрицы на скаляр
@@ -653,6 +755,24 @@ void Matrix::divide_scal() {
 	cout << "\nРезультирующая матрица: \n";
 	printMatrix(*m3);
 	chooseMatrix(*m3);
+
+}
+
+/*для нахождения обратной матрицы*/
+
+void Matrix::divide_scal(double scal) {
+	
+	//Matrix* m3 = new Matrix(row, col);
+
+	for (int i = 0; i < row; i++)   //строки массива
+	{
+		for (int j = 0; j < col; j++)   //столбцы массива
+		{
+			matrix_array[i][j] /= scal;  //заполняем текущую ячейку
+
+		}
+	}
+	
 
 }
 
@@ -766,104 +886,158 @@ bool Matrix::areEqual(Matrix m2) {
 	}
 }
 
-void Matrix::findDet() {
+void Matrix::findNorm() {
+
+}
+
+double Matrix::findDet() {
 	if (row != col) {
 
 		cout << "Поиск определителя доступен только для квадратных матриц\nВыберите другое действие или создайте новую матрицу\n";
 	}
 	else {
 
+		Matrix* m2 = new Matrix(*this);
+		//printMatrix(*m2);
+		//приведение матрицы к верхнетреугольному виду
+		for (int step = 0; step < m2->row - 1; step++)
+			for (int row_count = step + 1; row_count < m2->row; row_count++)
+			{
+				if (m2->matrix_array[step][step] != 0)
+				{
+					double coeff = -m2->matrix_array[row_count][step] / m2->matrix_array[step][step]; //метод Гаусса
+
+					for (int col_count = step; col_count < m2->row; col_count++)
+						m2->matrix_array[row_count][col_count] += m2->matrix_array[step][col_count] * coeff;
+				}
+			}
+		//cout << "\n";
+		
+		//printMatrix(*m2);
+
+		//cout << "\n";
+		//Рассчитать определитель как произведение элементов главной диагонали
+		double Det = 1;
+		for (int i = 0; i < m2->row; i++)
+			Det *= m2->matrix_array[i][i];
+
+		cout << "Детерминант = " << Det << endl;
+		return Det;
+
 
 	}
 }
+
+double Matrix::findDet(int n, double** array) {
+	double Det;
+
+	if (n == 2) {
+		Det = array[0][0] * array[1][1] - array[1][0] * array[0][1];
+		}
+	else {
+		
+		double** temp = new double* [n];    // массив указателей
+		for (int i = 0; i < n; i++) {   //
+			temp[i] = new double[n];     // инициализация указателей
+		}
+
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++)
+				temp[i][j] = array[i][j];
+
+		//приведение матрицы к верхнетреугольному виду
+		for (int step = 0; step < n - 1; step++)
+			for (int row_count = step + 1; row_count < n; row_count++)
+			{
+				double coeff = -temp[row_count][step] / temp[step][step]; //метод Гаусса
+				for (int col_count = step; col_count < n; col_count++)
+					temp[row_count][col_count] += temp[step][col_count] * coeff;
+			}
+
+		//Рассчитать определитель как произведение элементов главной диагонали
+		Det = 1;
+		for (int i = 0; i < n; i++)
+			Det *= temp[i][i];
+	}
+		return Det;
+}
+
+
 
 
 
 void Matrix::invertMatrix() {
 	if (row != col) {
 
-		cout << "Поиск определителя доступен только для квадратных матриц\nВыберите другое действие или создайте новую матрицу\n";
+		cout << "Поиск обратной матрицы доступен только для квадратных матриц\nВыберите другое действие или создайте новую матрицу\n";
 	}
 	else {
-		Matrix* m3 = new Matrix(row, col);
 
-
-
-		// создание
-		double** matrix;
-
-		// создание
-		matrix = new double* [row];    // массив указателей
-		for (int i = 0; i < row; i++) {   //
-			matrix[i] = new double[col];     // инициализация указателей
-
-		}
-
-		for (int i = 0; i < row; i++) {
-			for (int j = 0; j < col; j++) {
-				if (i == j)
-					matrix[i][j] = 1;
-				else
-					matrix[i][j] = 0;
-			}
-		}
-
-		m3->matrix_array = matrix;
-
-
-		printMatrix(*m3);
-		// converting matrix to e
-
-		
-		for (int i = 0; i < row; i++)
-
+		if (findDet(row, matrix_array) == 0)
 		{
+			cout << "Матрица вырожденная, определитель равен нулю.\nОбратной матрицы не существует\nВыберите другое действие или создайте новую матрицу\n";
+		}
+		else {
+			Matrix* m3 = new Matrix(row, col);
 
-			// normalizing row (making first element =1)
+			double det = findDet(row, this->matrix_array);
 
-			long double temp = matrix_array[i][0];
+			double** complement_matrix; //матрица алгебраических дополнений
 
-			for (int j = row - 1; j >= 0; j--)
-
-			{
-
-				m3->matrix_array[i][j] /= temp;
-
-				matrix_array[i][j] /= temp;
-
+			complement_matrix = new double* [this->row];    // массив указателей
+			for (int i = 0; i < row; i++) {   //
+				complement_matrix[i] = new double[col];     // инициализация указателей
 			}
 
-			// excluding i-th element from each row except i-th one
 
-			for (int j = 0; j < row; j++)
-
-				if (j != i)
-
+			for (int i = 0; i < row; i++)
+			{
+				for (int j = 0; j < col; j++)
 				{
-
-					temp = matrix_array[i][j];
-
-					for (int k = row - 1; k >= 0; k--)
-
+					double t;
+					t = findDet(row - 1, minorMatrix(i, j, *this));
+					complement_matrix[i][j] = t;
+					if ((i + j) % 2 == 1)
 					{
-
-						m3->matrix_array[j][k] -= m3->matrix_array[i][k] * temp;
-
-						matrix_array[j][k] -= matrix_array[i][k] * temp;
-
+						complement_matrix[i][j] *= -1;
 					}
 
+
 				}
+			}
+
+			//for (int i = 0; i < row; i++)
+			//{
+			//	cout << "\n";
+			//	for (int j = 0; j < col; j++)
+			//	{
+			//		cout << complement_matrix[i][j] << " ";
+			//	}
+			//}
+
+			for (int i = 0; i < row; i++)
+			{
+				for (int j = 0; j < col; j++)
+				{
+					m3->matrix_array[i][j] = complement_matrix[i][j];
+				}
+			}
+
+			m3 = &m3->transMatrix(*m3);
+			m3->divide_scal(det);
+		
+			
+			//проверка на единичную матрицу
+			//m3->matrix_array = m3->times(this);
+			printMatrix(*m3);
+
+			chooseMatrix(*m3);
 
 		}
 
-		cout << "\n";
-		printMatrix(*m3);
-		cout << "\n";
-		printMatrix(*this);
-
-
 	}
+		
+	
 }
 
 /*Транспонирование матрицы 1 (для вызова из меню)
