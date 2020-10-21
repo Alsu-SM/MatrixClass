@@ -1,3 +1,4 @@
 ﻿  Matrix.cpp
-C:\Users\Alsu\source\repos\matrixClass\matrixClass\Matrix.cpp(929): warning C4715: Matrix::findDet: значение возвращается не при всех путях выполнения
+C:\Users\Alsu\source\repos\matrixClass\matrixClass\Matrix.cpp(383): warning C4715: Matrix::load: значение возвращается не при всех путях выполнения
+C:\Users\Alsu\source\repos\matrixClass\matrixClass\Matrix.cpp(1021): warning C4715: Matrix::findDet: значение возвращается не при всех путях выполнения
   matrixClass.vcxproj -> C:\Users\Alsu\source\repos\matrixClass\Debug\matrixClass.exe

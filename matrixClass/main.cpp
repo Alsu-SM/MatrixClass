@@ -19,51 +19,51 @@ int main()
 	{
 		int v;
 		v = menu();
-		if (v == 1)
-		{
+		switch (v) {
+		case 1:
 			m = new Matrix();
-		}
-					
-		if (v == 2)
+			break;
+		case 2:
 			m->plus();
-
-		if (v == 3)
+			break;
+		case 3:
 			m->minus();
-
-		if (v == 4)
+			break;
+		case 4:
 			m->times();
-
-		if (v == 5)
+			break;
+		case 5:
 			m->times_scal();
-
-		if (v == 6)
+			break;
+		case 6:
 			m->divide_scal();
-		
-		if (v == 7)
+			break;
+		case 7:
 			m->pow();
-
-		if (v == 8)
+			break;
+		case 8:
 			m->areEqual();
-
-		if (v == 9)
+			break;
+		case 9:
 			m->checkType();
-
-		if (v == 10)
+			break;
+		case 10:
 			m->transMatrix();
-
-		if (v == 11)
+			break;
+		case 11:
 			m->findDet();
-
-		if (v == 12)
+			break;
+		case 12:
 			m->invertMatrix();
-
-		if (v == 13)
+			break;
+		case 13:
 			m->save();
-
-		if (v == 0)
+			break;
+		case 0:
 			exit(1);
-
-
+			break;
+		}
+		
 	}
 
 	return 0;

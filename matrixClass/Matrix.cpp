@@ -9,6 +9,11 @@
 using namespace std;
 int v = 0;
 bool matrixExists = false;
+int checkFile[2];
+
+/*Функция возвращает матрицу минора, который получается вычеркиваниеми из исходной матрицы r-той строки и c-того столбца
+* Используется при нахождении обратной матрицы
+*/ 
 
 
 double **Matrix::minorMatrix(int r, int c, Matrix m) {
@@ -67,13 +72,15 @@ double **Matrix::minorMatrix(int r, int c, Matrix m) {
 
 }
 
+/*Функция сохраняет полученную матрицу в файл output.txt*/
+
 void Matrix::save() {
 
 	ofstream in("output.txt");
 	if (in.is_open())
 	{
 		//Если открытие файла прошло успешно
-		//Считаем матрицу из файла
+		
 		for (int i = 0; i < row; i++)
 		{
 			if (i>0)
@@ -83,6 +90,8 @@ void Matrix::save() {
 		}
 		cout << "Матрица успешно сохранена в файле \'output.txt\'" << endl;
 	}
+	else 
+		cout << "Не удалось открыть файл " << endl;
 }
 
 /*Функция, реализующая меню. 
@@ -93,7 +102,7 @@ int menu()
 {
 	if (matrixExists) {
 		cout << "\n\nЧто вы хотите сделать?\n" << endl;
-		cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - сравнение с другой матрицей (проверка на равенство)\n 9 - Проверка типа матрицы \n10 - Транспонирование\n11 - Вычисление обратной матрицы\n12 - Вычисление детерминанта\n\n13 - Сохранить матрицу в файл\n\n0 - Выйти" << endl;
+		cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - сравнение с другой матрицей (проверка на равенство)\n 9 - Проверка типа матрицы \n10 - Транспонирование\n11 - Вычисление детерминанта\n12 - Вычисление обратной матрицы\n\n13 - Сохранить матрицу в файл\n\n0 - Выйти" << endl;
 
 		for (;;)
 		{
@@ -312,65 +321,67 @@ double** Matrix::load() {
 	//Создаем файловый поток и связываем его с файлом
 	ifstream in("input.txt");
 
-
-	int count = 0;// число чисел в файле
-	int temp;//Временная переменная
-
-
-	while (!in.eof())// пробегаем пока не встретим конец файла eof
+	if (in.is_open()) 
 	{
-		in >> temp;//в пустоту считываем из файла числа
-		count++;// увеличиваем счетчик числа чисел
+
+		int count = 0;// число чисел в файле
+		int temp;//Временная переменная
+
+
+		while (!in.eof())// пробегаем пока не встретим конец файла eof
+		{
+			in >> temp;//в пустоту считываем из файла числа
+			count++;// увеличиваем счетчик числа чисел
+		}
+
+
+		//Вначале переведем каретку в потоке в начало файла
+		in.seekg(0, ios::beg);
+		in.clear();
+
+		//Число пробелов в первой строчке вначале равно 0
+		int count_space = 0;
+		char symbol;
+		while (!in.eof())//на всякий случай цикл ограничиваем концом файла
+		{
+			//теперь нам нужно считывать не числа, а посимвольно считывать данные
+			in.get(symbol);//считали текущий символ
+			if (symbol == ' ') count_space++;//Если это пробел, то число пробелов увеличиваем
+			if (symbol == '\n') break;//Если дошли до конца строки, то выходим из цикла
+		}
+
+
+		//Опять переходим в потоке в начало файла
+		in.seekg(0, ios::beg);
+		in.clear();
+
+		//Теперь мы знаем сколько чисел в файле и сколько пробелов в первой строк
+
+		checkFile[1]=col = count_space + 1; //чисел в одной строке
+		checkFile[0] = row = count / col; //всего строк
+
+		double** matrix;
+
+		// создание
+		matrix = new double* [row];    // массив указателей
+		for (int i = 0; i < row; i++) {   //
+			matrix[i] = new double[col];     // инициализация указателей
+
+		}
+			//Считаем матрицу из файла
+			for (int i = 0; i < row; i++)
+				for (int j = 0; j < col; j++)
+					in >> matrix[i][j];
+	
+		
+		return matrix;
 	}
-
-
-	//Вначале переведем каретку в потоке в начало файла
-	in.seekg(0, ios::beg);
-	in.clear();
-
-	//Число пробелов в первой строчке вначале равно 0
-	int count_space = 0;
-	char symbol;
-	while (!in.eof())//на всякий случай цикл ограничиваем концом файла
-	{
-		//теперь нам нужно считывать не числа, а посимвольно считывать данные
-		in.get(symbol);//считали текущий символ
-		if (symbol == ' ') count_space++;//Если это пробел, то число пробелов увеличиваем
-		if (symbol == '\n') break;//Если дошли до конца строки, то выходим из цикла
+	else {
+		cout << "Не удалось открыть файл " << endl;
 	}
-
-
-	//Опять переходим в потоке в начало файла
-	in.seekg(0, ios::beg);
-	in.clear();
-
-	//Теперь мы знаем сколько чисел в файле и сколько пробелов в первой строк
-
-	col = count_space + 1; //чисел в одной строке
-	row = count / col; //всего строк
-
-	double** matrix;
-
-	// создание
-	matrix = new double* [row];    // массив указателей
-	for (int i = 0; i < row; i++) {   //
-		matrix[i] = new double[col];     // инициализация указателей
-
-	}
-
-	if (in.is_open())
-	{
-		//Если открытие файла прошло успешно
-		//Считаем матрицу из файла
-		for (int i = 0; i < row; i++)
-			for (int j = 0; j < col; j++)
-				in >> matrix[i][j];
-	}
-
-
-	return matrix;
 
 }
+
 
 
 /*Конструктор 1 
@@ -460,7 +471,7 @@ Matrix::Matrix(const Matrix& m) {
 
 }
 
-/*Сложение матрицы
+/*Сложение матрицы (вызывается из меню)
 
 Создается новый объект m2, для которого вызывается "тихий конструктор". 
 Число столбцов и строк новой матрицы совпадают с исходными.
@@ -477,23 +488,45 @@ Matrix::Matrix(const Matrix& m) {
 void Matrix::plus() {
 	cout << "Необходимо создать новый объект для действий с другой матрицей.\nУчтите, что количество строк и столбцов матриц должны совпадать.\n" << endl;
 	Matrix* m2 = new Matrix(row, col);
-	cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
-	int ans;
-	cout << "Ваш выбор: ";
-	cin >> ans;
-	cout << "\n";
+	m2->load();
+	if(checkFile[0]!=row || checkFile[1]!=col)
+	{
+		cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\nЗагрузка из файла недоступна (матрица не удовлетворяет условиям)\n" << endl;
+		int ans;
+		cout << "Ваш выбор: ";
+		cin >> ans;
+		cout << "\n";
 
-	switch (ans) {
-	case 1:
-		m2->matrix_array = create(row, col);
-		break;
-	case 2:
-		m2->matrix_array = generate(row, col);
-		break;
-	case 3:
-		m2->matrix_array = load();
-		break;
+		switch (ans) {
+		case 1:
+			m2->matrix_array = create(row, col);
+			break;
+		case 2:
+			m2->matrix_array = generate(row, col);
+			break;
+		}
+
 	}
+	else {
+		cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
+		int ans;
+		cout << "Ваш выбор: ";
+		cin >> ans;
+		cout << "\n";
+
+		switch (ans) {
+		case 1:
+			m2->matrix_array = create(row, col);
+			break;
+		case 2:
+			m2->matrix_array = generate(row, col);
+			break;
+		case 3:
+			m2->matrix_array = load();
+			break;
+		}
+	}
+	
 
 
 	cout << "\nИтак:\n";
@@ -517,31 +550,53 @@ void Matrix::plus() {
 
 }
 
-/*Вычитание матрицы
+/*Вычитание матрицы (вызывается из меню)
 
 Полная аналогия со сложением
 
 */
 void Matrix::minus() {
-	cout << "\nНеобходимо создать новый объект для действий с другой матрицей.\nУчтите, что количество строк и столбцов матриц должны совпадать.\n" << endl;
+	cout << "Необходимо создать новый объект для действий с другой матрицей.\nУчтите, что количество строк и столбцов матриц должны совпадать.\n" << endl;
 	Matrix* m2 = new Matrix(row, col);
-	cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
-	int ans;
-	cout << "Ваш выбор: ";
-	cin >> ans;
-	cout << "\n";
+	m2->load();
+	if (checkFile[0] != row || checkFile[1] != col)
+	{
+		cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\nЗагрузка из файла недоступна (матрица не удовлетворяет условиям)\n" << endl;
+		int ans;
+		cout << "Ваш выбор: ";
+		cin >> ans;
+		cout << "\n";
 
-	switch (ans) {
-	case 1:
-		m2->matrix_array = create(row, col);
-		break;
-	case 2:
-		m2->matrix_array = generate(row, col);
-		break;
-	case 3:
-		m2->matrix_array = load();
-		break;
+		switch (ans) {
+		case 1:
+			m2->matrix_array = create(row, col);
+			break;
+		case 2:
+			m2->matrix_array = generate(row, col);
+			break;
+		}
+
 	}
+	else {
+		cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
+		int ans;
+		cout << "Ваш выбор: ";
+		cin >> ans;
+		cout << "\n";
+
+		switch (ans) {
+		case 1:
+			m2->matrix_array = create(row, col);
+			break;
+		case 2:
+			m2->matrix_array = generate(row, col);
+			break;
+		case 3:
+			m2->matrix_array = load();
+			break;
+		}
+	}
+
 
 	cout << "\nИтак:\n";
 	cout << "\nУменьшаемое: \n";
@@ -564,7 +619,7 @@ void Matrix::minus() {
 	chooseMatrix(*m3);
 }
 
-/*Умножение матрицы
+/*Умножение матрицы (вызывается из меню)
 
 При умножении, количество строк новой матрицы должно совпадать с количеством столбцов исходной. 
 Поэтому программа запрашивает только количество столбцов второй матрицы.
@@ -587,24 +642,51 @@ void Matrix::times() {
 	int ans;
 	cin >> ans;
 
-	Matrix* m2 = new Matrix(col, ans);
-	cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
+	Matrix* m2;
+	m2 = new Matrix(col, ans);
 
-	cout << "Ваш выбор: ";
-	cin >> ans;
-	cout << "\n";
+	m2->load();
 
-	switch (ans) {
-	case 1:
-		m2->matrix_array = create(m2->row, m2->col);
-		break;
-	case 2:
-		m2->matrix_array = generate(m2->row, m2->col);
-		break;
-	case 3:
-		m2->matrix_array = load();
-		break;
+	m2 = new Matrix(col, ans);
+	if (checkFile[0] != col)
+	{
+		cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\nЗагрузка из файла недоступна (матрица не удовлетворяет условиям)\n" << endl;
+		int ans;
+		cout << "Ваш выбор: ";
+		cin >> ans;
+		cout << "\n";
+
+		switch (ans) {
+		case 1:
+			m2->matrix_array = create(m2->row, m2->col);
+			break;
+		case 2:
+			m2->matrix_array = generate(m2->row, m2->col);
+			break;
+		}
+
 	}
+	else {
+		cout << "\n\nКак вы хотите заполнить матрицу: \n1 - вручную\n2 - сгенерировать автоматически\n3 - загрузить из файла\n" << endl;
+		int ans;
+		cout << "Ваш выбор: ";
+		cin >> ans;
+		cout << "\n";
+
+		switch (ans) {
+		case 1:
+			m2->matrix_array = create(m2->row, m2->col);
+			break;
+		case 2:
+			m2->matrix_array = generate(m2->row, m2->col);
+			break;
+		case 3:
+			m2->matrix_array = load();
+			break;
+		}
+	}
+
+		
 	Matrix* m3 = new Matrix(this->row, m2->col);
 	cout << "\n";
 	cout << "\nИтак\n";
@@ -614,7 +696,6 @@ void Matrix::times() {
 	printMatrix(*m2);
 	for (int i = 0; i < this->row; i++)
 	{
-
 		cout << "\n";
 		for (int j = 0; j < m2->col; j++)
 		{
@@ -626,6 +707,16 @@ void Matrix::times() {
 
 			}
 			//cout << m3->matrix_array[i][j] << " ";
+		}
+	}
+
+	
+	for (int i = 0; i < m3->row; i++)
+	{
+		for (int j = 0; j < m3->col; j++)
+		{
+			if (abs(m3->matrix_array[i][j]) < 2.22045e-13)
+				m3->matrix_array[i][j] = 0;
 		}
 	}
 
@@ -673,7 +764,7 @@ double** Matrix::times(Matrix* m2) {
 
 }
 
-/*Умножение матрицы на скаляр
+/*Умножение матрицы на скаляр (вызывается из меню)
 
 Поэлементно умножает матрицу на введенное с клавиатуры число. 
 Можно ввести проверку на недопустимые символы.
@@ -703,6 +794,8 @@ void Matrix::times_scal() {
 
 
 }
+/*Вспомогательная функция умножения на скаляр
+Используется при нахождении обратной матрицы*/
 
 Matrix Matrix::times_scal(double scal) {
 	
@@ -724,8 +817,6 @@ Matrix Matrix::times_scal(double scal) {
 
 Поэлементно делит матрицу на введенное с клавиатуры число.
 Есть проверка на деление на ноль.
-
-Можно ввести проверку на недопустимые символы.
 
 */
 
@@ -839,8 +930,10 @@ void Matrix::pow() {
 void Matrix::areEqual() {
 	cout << "С какой матрицей вы хотите сравнить исходную матрицу?\n";
 	Matrix* m2 = new Matrix();
+	cout << "\nСравниваем с матрцией: " << endl;
+	printMatrix(*m2);
 	if (row != m2->row || col != m2->col) {
-		cout << "\nМатрицы не равны \n" << endl;
+		cout << "\n\nМатрицы не равны \n" << endl;
 		
 	}
 	else {
@@ -849,12 +942,12 @@ void Matrix::areEqual() {
 			{
 				if (matrix_array[i][j] != m2->matrix_array[i][j])
 				{
-					cout << "\nМатрицы не равны \n" << endl;
+					cout << "\n\nМатрицы не равны \n" << endl;
 					return;
 				}
 			}
 
-		cout << "\nМатрицы равны \n" << endl;
+		cout << "\n\nМатрицы равны \n" << endl;
 		
 	}
 }
@@ -989,7 +1082,7 @@ void Matrix::invertMatrix() {
 				complement_matrix[i] = new double[col];     // инициализация указателей
 			}
 
-
+			//заполняем матрицу алгебраических дополнений определителями миноров
 			for (int i = 0; i < row; i++)
 			{
 				for (int j = 0; j < col; j++)
@@ -1023,6 +1116,7 @@ void Matrix::invertMatrix() {
 				}
 			}
 
+			//транспонируем матрицу алгебраических дополнений и делим ее на определитель исходной
 			m3 = &m3->transMatrix(*m3);
 			m3->divide_scal(det);
 		
@@ -1131,6 +1225,7 @@ void Matrix::checkType() {
 		}
 
 	}
+	//если матрица не квадратная - сразу делаем вывод, что она не диагональная, единичная, верхне- и нижнетреугольная
 	else {
 		diagonal = false;
 		identity = false;
