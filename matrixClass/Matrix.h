@@ -1,63 +1,55 @@
 #pragma once
 
 int menu();
-
-
-
+void readFile(int& r, int& c);
 
 
 class Matrix
 {
 
-public:
-	
+private:
+
 	int col;
 	int row;
 	double** matrix_array;
 
-	double** minorMatrix(int, int, Matrix);
 
-	void printMatrix(Matrix m);
-	void chooseMatrix(Matrix m3);
+public:
+	
+	Matrix* minorMatrix(int, int);
 
-	double** generate();
+	void printMatrix();
+	void chooseMatrix(Matrix* m3, int ans);
+
+
 	double** generate(int, int);
-
-	double** create();
 	double** create(int, int);
-
-	double** load();
+	double** load(int row, int col);
+	
 	void save();
-
-	Matrix();
-	Matrix(int r, int c);
-	Matrix(const Matrix& m);
-
-	void plus();
-	void minus();
 	
-	void times();
-	double** times(Matrix* m2);
-	void times_scal();
-	Matrix times_scal(double);
 
-	void divide_scal();
-	void divide_scal(double);
+	Matrix(int r, int c, int ans);
+
 	
-	void pow();
+	void plus(Matrix *m2, Matrix *m3);
+	void minus(Matrix* m2, Matrix* m3);
+	
+	
+	void times(Matrix* m2, Matrix* m3);
+	void times_scal(double, Matrix *m3);
+	void divide_scal(double scal, Matrix* m3);
+	void pow(int n, Matrix* m3);
 
-	void areEqual();
-	bool areEqual(Matrix m3);
+	bool areEqual(Matrix *m2);
 	
 	void findNorm();
 	double findDet();
-	double findDet(int, double**);
-	void invertMatrix();
-	
-	Matrix transMatrix();
-	Matrix transMatrix(Matrix m);
 
-	void checkType();
+	void invertMatrix(Matrix* m3);
+	Matrix transMatrix(Matrix* m3);
+
+	bool* checkType();
 
 };
 
