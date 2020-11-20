@@ -4,6 +4,12 @@ int menu();
 void readFile(int& r, int& c);
 
 
+double** generate(int, int);
+double** create(int, int);
+double** load(int row, int col);
+
+
+
 class Matrix
 {
 
@@ -15,21 +21,27 @@ private:
 
 
 public:
+
+	
+	void operator+=(Matrix* second);
+	void operator-=(Matrix* second);
+	void operator/=(double scal);
+	void operator*=(Matrix* second);
+
 	
 	Matrix* minorMatrix(int, int);
 
 	void printMatrix();
-	void chooseMatrix(Matrix* m3, int ans);
+	
 
+	bool isSquare();
 
-	double** generate(int, int);
-	double** create(int, int);
-	double** load(int row, int col);
 	
 	void save();
 	
 
-	Matrix(int r, int c, int ans);
+	Matrix(int r, int c, double** array);
+	Matrix(Matrix&m);
 
 	
 	void plus(Matrix *m2, Matrix *m3);
@@ -43,7 +55,7 @@ public:
 
 	bool areEqual(Matrix *m2);
 	
-	void findNorm();
+	double findNorm();
 	double findDet();
 
 	void invertMatrix(Matrix* m3);
