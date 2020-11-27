@@ -11,10 +11,10 @@ int v = 0;
 bool matrixExists = false;
 
 
-/*×òîáû  îïðåäåëèòü ÷èñëî ñòðîê è ñòîëáöîâ, 
-ñ÷èòàåì êîëè÷åñòâî ÷èñåë â ôàéëå è êîëè÷åñòâî ïðîáåëîâ íà îäíîé ñòðîêå. 
+/*Чтобы определить число строк и столбцов, 
+считаем количество чисел в файле и количество пробелов на одной строке. 
 
-Äîïóùåíèå - ìåæäó ÷èñëàìè ìàòðèöû ðîâíî ïî îäíîìó ïðîáåëó, â êîíöå êàæäîé ñòðîêè ëèøíåãî ïðîáåëà íåò.
+Допущение - между числами матрицы ровно по одному пробелу, в конце каждой строки лишнего пробела нет.
 */
 
 void readFile(int &r, int &c) {
@@ -23,53 +23,52 @@ void readFile(int &r, int &c) {
 	if (in.is_open())
 	{
 
-		int count = 0;// ÷èñëî ÷èñåë â ôàéëå
+		int count = 0;// число чисел в файле
 		int temp;//Âðåìåííàÿ ïåðåìåííàÿ
 
 
-		while (!in.eof())// ïðîáåãàåì ïîêà íå âñòðåòèì êîíåö ôàéëà eof
+		while (!in.eof())// пробегаем пока не встретим конец файла eof
 		{
-			in >> temp;//â ïóñòîòó ñ÷èòûâàåì èç ôàéëà ÷èñëà
-			count++;// óâåëè÷èâàåì ñ÷åò÷èê ÷èñëà ÷èñåë
+			in >> temp;//в пустоту считываем из файла числа
+			count++;// увеличиваем счетчик числа чисел
 		}
 
 
-		//Âíà÷àëå ïåðåâåäåì êàðåòêó â ïîòîêå â íà÷àëî ôàéëà
+		//Вначале переведем каретку в потоке в начало файла
 		in.seekg(0, ios::beg);
 		in.clear();
 
-		//×èñëî ïðîáåëîâ â ïåðâîé ñòðî÷êå âíà÷àëå ðàâíî 0
+		//Число пробелов в первой строчке вначале равно 0
 		int count_space = 0;
 		char symbol;
-		while (!in.eof())//íà âñÿêèé ñëó÷àé öèêë îãðàíè÷èâàåì êîíöîì ôàéëà
+		while (!in.eof())//на всякий случай цикл ограничиваем концом файла
 		{
-			//òåïåðü íàì íóæíî ñ÷èòûâàòü íå ÷èñëà, à ïîñèìâîëüíî ñ÷èòûâàòü äàííûå
-			in.get(symbol);//ñ÷èòàëè òåêóùèé ñèìâîë
-			if (symbol == ' ') count_space++;//Åñëè ýòî ïðîáåë, òî ÷èñëî ïðîáåëîâ óâåëè÷èâàåì
-			if (symbol == '\n') break;//Åñëè äîøëè äî êîíöà ñòðîêè, òî âûõîäèì èç öèêëà
+			//теперь нам нужно считывать не числа, а посимвольно считывать данные
+			in.get(symbol);//считали текущий символ
+			if (symbol == ' ') count_space++;//Если это пробел, то число пробелов увеличиваем
+			if (symbol == '\n') break;//Если дошли до конца строки, то выходим из цикла
 		}
 
-
-		//Îïÿòü ïåðåõîäèì â ïîòîêå â íà÷àëî ôàéëà
+		//Опять переходим в потоке в начало файла
 		in.seekg(0, ios::beg);
 		in.clear();
 
-		//Òåïåðü ìû çíàåì ñêîëüêî ÷èñåë â ôàéëå è ñêîëüêî ïðîáåëîâ â ïåðâîé ñòðîê
+		//Теперь мы знаем сколько чисел в файле и сколько пробелов в первой строк
 
-		r = count_space + 1; //÷èñåë â îäíîé ñòðîêå
-		c = count / r; //âñåãî ñòðîê
+		r = count_space + 1; //чисел в одной строке
+		c = count / r; //всего строк
 	}
 
 	
 }
-/*Ôóíêöèÿ âîçâðàùàåò ìàòðèöó ìèíîðà, êîòîðûé ïîëó÷àåòñÿ âû÷åðêèâàíèåìè èç èñõîäíîé ìàòðèöû
-r-òîé ñòðîêè è c-òîãî ñòîëáöà */
+/*Функция возвращает матрицу минора, который получается вычеркиваниеми из исходной матрицы
+r-той строки и c-того столбца */
 Matrix* Matrix::minorMatrix(int r, int c) {
 	
-	int n = this->row - 1; // ÷èñëî ñòðîê è ñòîëáöîâ ìèíîðà
-	double** zero_array = new double* [n];    // ìàññèâ óêàçàòåëåé
+	int n = this->row - 1;// число строк и столбцов минора
+	double** zero_array = new double* [n];  // массив указателей
 	for (int i = 0; i < n; i++) {   //
-		zero_array[i] = new double[n];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+		zero_array[i] = new double[n];  // инициализация указателей
 
 	}
 	for (int i = 0; i < n; i++)
@@ -81,9 +80,9 @@ Matrix* Matrix::minorMatrix(int r, int c) {
 	}
 	Matrix* minor = new Matrix(n, n, zero_array);
 
-	minor->matrix_array = new double* [n];    // ìàññèâ óêàçàòåëåé
+	minor->matrix_array = new double* [n];  
 	for (int i = 0; i < n; i++) {   //
-		minor->matrix_array[i] = new double[n];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+		minor->matrix_array[i] = new double[n];   
 
 	}
 	
@@ -118,14 +117,14 @@ Matrix* Matrix::minorMatrix(int r, int c) {
 
 }
 
-/*Ôóíêöèÿ ñîõðàíÿåò ïîëó÷åííóþ ìàòðèöó â ôàéë output.txt*/
+/*Функция сохраняет полученную матрицу в файл output.txt*/
 
 void Matrix::save() {
 
 	ofstream in("output.txt");
 	if (in.is_open())
 	{
-		//Åñëè îòêðûòèå ôàéëà ïðîøëî óñïåøíî
+		//Если открытие файла прошло успешно
 		
 		for (int i = 0; i < row; i++)
 		{
@@ -140,24 +139,25 @@ void Matrix::save() {
 		cout << "Íå óäàëîñü îòêðûòü ôàéë " << endl;
 }
 
-/*Ôóíêöèÿ, ðåàëèçóþùàÿ ìåíþ. 
-Ïðè ïåðâîì âûçîâå ïðåäëàãàåò ñîçäàòü ìàòðèöó è âûçûâàåò êîíñòðóêòîð.
-Ïðè ïîñëåäóþùèõ ñòàíîâÿòñÿ äîñòóïíû äðóãèå äåéñòâèÿ, â ò.÷. âûõîä èç ïðîãðàììû èëè âûáîð íîâîé ìàòðèöû*/
+/*Функция, реализующая меню. 
+При первом вызове предлагает создать матрицу и вызывает конструктор.
+При последующих становятся доступны другие действия, в т.ч. выход из программы или выбор новой матрицы*/
+
 
 int menu()
 {
 	if (matrixExists) {
-		cout << "\n\n×òî âû õîòèòå ñäåëàòü?\n" << endl;
-		cout << "\n1 - Äîáàâèòü íîâóþ ìàòðèöó\n\n2 - Ñëîæåíèå\n3 - Âû÷èòàíèå\n4 - Óìíîæåíèå íà ìàòðèöó\n5 - Óìíîæåíèå íà ñêàëÿð\n6 - Äåëåíèå íà ñêàëÿð\n7 - Âîçâåäåíèå â ñòåïåíü\n8 - ñðàâíåíèå ñ äðóãîé ìàòðèöåé (ïðîâåðêà íà ðàâåíñòâî)\n 9 - Ïðîâåðêà òèïà ìàòðèöû \n10 - Òðàíñïîíèðîâàíèå\n11 - Âû÷èñëåíèå íîðìû ìàòðèöû\n12 - Âû÷èñëåíèå äåòåðìèíàíòà\n13 - Âû÷èñëåíèå îáðàòíîé ìàòðèöû\n\n14: +=\n15: -=\n16: /=\n17: *=\n\n18 - Ñîõðàíèòü ìàòðèöó â ôàéë\n\n0 - Âûéòè" << endl;
+		cout << "\n\nЧто вы хотите сделать?\n" << endl;
+		cout << "\n1 - Добавить новую матрицу\n\n2 - Сложение\n3 - Вычитание\n4 - Умножение на матрицу\n5 - Умножение на скаляр\n6 - Деление на скаляр\n7 - Возведение в степень\n8 - сравнение с другой матрицей (проверка на равенство)\n 9 - Проверка типа матрицы \n10 - Транспонирование\n11 - Вычисление нормы матрицы\n12 - Вычисление детерминанта\n13 - Вычисление обратной матрицы\n\n14: +=\n15: -=\n16: /=\n17: *=\n\n18 - Сохранить матрицу в файл\n\n0 - Выйти" << endl;
 
 		for (;;)
 		{
-			cout << "\nÂàø âûáîð: ";
+			cout << "\nВаш выбор: ";
 			cin >> v;
 			cout << "\n";
 
 			if (v < 0 || v > 18) {
-				cout << "\nÏîæàëóéñòà, ââåäèòå ÷èñëà îò 0 äî 18.\n\n" << endl;
+				cout << "\nПожалуйста, введите числа от 0 до 18.\n\n" << endl;
 				continue;
 			}
 
@@ -165,7 +165,7 @@ int menu()
 		}
 	}
 	else {
-		cout << "Äîáðî ïîæàëîâàòü â ïðîãðàììó! Íàæìèòå enter, ÷òîáû äîáàâèòü íîâóþ ìàòðèöó" << endl;
+		cout << "Добро пожаловать в программу! Нажмите enter, чтобы добавить новую матрицу" << endl;
 		v = 1;
 		cin.get();
 		matrixExists = true;
@@ -174,7 +174,7 @@ int menu()
 	}
 }
 
-/*ïå÷àòü ìàòðèöû*/
+/*печать матрицы*/
 
 void Matrix::printMatrix() {
 
@@ -191,32 +191,30 @@ void Matrix::printMatrix() {
 	}
 }
 
-/*êîíñòðóêòîð êîïèðîâàíèÿ*/
-
-
+/*конструктор копирования*/
 
 Matrix::Matrix(Matrix& m) {
 	this->row = m.row;
 	this->col = m.col;
 //	delete[] this->matrix_array;
 
-	this->matrix_array = new double* [row];    // ìàññèâ óêàçàòåëåé
+	this->matrix_array = new double* [row];    
 	for (int i = 0; i < row; i++) {   //
-		this->matrix_array[i] = new double[col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+		this->matrix_array[i] = new double[col];     
 
 	}
 
-	for (int i = 0; i < this->row; i++)   //ñòðîêè ìàññèâà
+	for (int i = 0; i < this->row; i++)   
 	{
-		for (int j = 0; j < this->col; j++)   //ñòîëáöû ìàññèâà
+		for (int j = 0; j < this->col; j++)   
 		{
-			this->matrix_array[i][j] = m.matrix_array[i][j];  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+			this->matrix_array[i][j] = m.matrix_array[i][j];  
 
 		}
 	}
 }
 
-/*Ôóíêöèÿ äëÿ ðó÷íîãî ââîäà ìàòðèöû ñ êëàâèàòóðû*/
+/*Функция для ручного ввода матрицы с клавиатуры*/
 
 double** create(int r, int c)
 
@@ -224,14 +222,14 @@ double** create(int r, int c)
 	double** matrix;
 
 	// ñîçäàíèå
-	matrix = new double* [r];    // ìàññèâ óêàçàòåëåé
-	for (int i = 0; i < r; i++) {   //
-		matrix[i] = new double[c];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+	matrix = new double* [r];    
+	for (int i = 0; i < r; i++) {   
+		matrix[i] = new double[c];     
 
 	}
 
 	for (int i = 0; i < r; i++) {
-		cout << "Ââîäèì " << i + 1 << " ñòðîêó: ";
+		cout << "Вводим " << i + 1 << " строку: ";
 		for (int j = 0; j < c; j++) {
 			cin >> matrix[i][j];
 		}
@@ -242,7 +240,8 @@ double** create(int r, int c)
 }
 
 
-/*Ôóíêöèÿ äëÿ ðàíäîìíîãî àâòîçàïîëíåíèÿ ìàòðèöû*/
+/*Функция для рандомного автозаполнения матрицы*/
+
 
 double** generate(int r, int c) {
 
@@ -250,17 +249,16 @@ double** generate(int r, int c) {
 	double** matrix;
 
 	// ñîçäàíèå
-	matrix = new double* [r];    // ìàññèâ óêàçàòåëåé
-	for (int i = 0; i < r; i++) {   //
-		matrix[i] = new double[c];     // èíèöèàëèçàöèÿ óêàçàòåëåé
-
+	matrix = new double* [r];    
+	for (int i = 0; i < r; i++) { 
+		matrix[i] = new double[c];     
 	}
 
-	for (int i = 0; i < r; i++)   //ñòðîêè ìàññèâà
+	for (int i = 0; i < r; i++)   
 	{
-		for (int j = 0; j < c; j++)   //ñòîëáöû ìàññèâà
+		for (int j = 0; j < c; j++)  
 		{
-			matrix[i][j] = 1 + rand() % 9;  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+			matrix[i][j] = 1 + rand() % 9;  
 
 		}
 	}
@@ -270,25 +268,25 @@ double** generate(int r, int c) {
 
 }
 
-/*çàãðóçêà ìàòðèöû èç ôàéëà*/
+/*загрузка матрицы из файла*//
 
 double** load(int row, int col) {
 	
 
-	//Ñîçäàåì ôàéëîâûé ïîòîê è ñâÿçûâàåì åãî ñ ôàéëîì
+	//Создаем файловый поток и связываем его с файлом
 	ifstream in("input.txt");
 
 	if (in.is_open()) 
 	{
 		double** matrix;
 
-		// ñîçäàíèå
-		matrix = new double* [row];    // ìàññèâ óêàçàòåëåé
+		// создание
+		matrix = new double* [row];    // массив указателей
 		for (int i = 0; i < row; i++) {   //
-			matrix[i] = new double[col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+			matrix[i] = new double[col];     // инициализация указателей
 
 		}
-			//Ñ÷èòàåì ìàòðèöó èç ôàéëà
+			//Считаем матрицу из файла
 			for (int i = 0; i < row; i++)
 				for (int j = 0; j < col; j++)
 					in >> matrix[i][j];
@@ -297,22 +295,21 @@ double** load(int row, int col) {
 		return matrix;
 	}
 	else {
-		cout << "Íå óäàëîñü îòêðûòü ôàéë " << endl;
+		cout << "Не удалось открыть файл " << endl;
 	}
 
 }
 
 
-
-/*Êîíñòðóêòîð */
+/*Конструктор */
 
 Matrix::Matrix(int r, int c, double** array) {
 	row = r; 
 	col = c;
 
-	matrix_array = new double* [row];    // ìàññèâ óêàçàòåëåé
-	for (int i = 0; i < row; i++) {   //
-		matrix_array[i] = new double[col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+	matrix_array = new double* [row]; 
+	for (int i = 0; i < row; i++) {  
+		matrix_array[i] = new double[col];    
 
 	}
 	for (int i = 0; i < row; i++)
@@ -328,32 +325,32 @@ Matrix::Matrix(int r, int c, double** array) {
 
 
 
-/* Ñëîæåíèå ìàòðèöû  */
+/* Сложение матрицы  */
 void Matrix::plus(Matrix* m2, Matrix* m3) {
 	
-	for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+	for (int i = 0; i < row; i++)   //строки массива
 	{
-		for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+		for (int j = 0; j < col; j++)   //столбцы массива
 		{
-			m3->matrix_array[i][j] = matrix_array[i][j] + m2->matrix_array[i][j];  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+			m3->matrix_array[i][j] = matrix_array[i][j] + m2->matrix_array[i][j];  //заполняем текущую ячейку
 
 		}
 	}
 
 }
 
-// Ïåðåãðóçêà îïåðàòîðîâ +=, -=, *=, /=
+// Перегрузка операторов +=, -=, *=, /=
 
 void Matrix::operator+=(Matrix* second) {
 	
 	if (this->row == second->row && this->col == second->col) {
 
 
-		for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+		for (int i = 0; i < row; i++)   //строки массива
 		{
-			for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+			for (int j = 0; j < col; j++)   //столбцы массива
 			{
-				this->matrix_array[i][j] += second->matrix_array[i][j];  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+				this->matrix_array[i][j] += second->matrix_array[i][j];  //заполняем текущую ячейку
 
 			}
 		}
@@ -367,11 +364,11 @@ void Matrix::operator-=(Matrix* second) {
 	if (this->row == second->row && this->col == second->col) {
 
 
-		for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+		for (int i = 0; i < row; i++)   //строки массива
 		{
-			for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+			for (int j = 0; j < col; j++)   //столбцы массива
 			{
-				matrix_array[i][j] -= second->matrix_array[i][j];  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+				matrix_array[i][j] -= second->matrix_array[i][j];  //заполняем текущую ячейку
 
 			}
 		}
@@ -382,11 +379,11 @@ void Matrix::operator-=(Matrix* second) {
 void Matrix::operator/=(double scal) {
 	if (scal != 0)
 	{
-		for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+		for (int i = 0; i < row; i++)   //строки массива
 		{
-			for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+			for (int j = 0; j < col; j++)   //столбцы массива
 			{
-				this->matrix_array[i][j] /= scal;  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+				this->matrix_array[i][j] /= scal;  //заполняем текущую ячейку
 
 			}
 		}
@@ -398,9 +395,9 @@ void Matrix::operator*=(Matrix* second) {
 	if (this->col == second->row) {
 		
 		
-		double** temp = new double* [this->row];    // ìàññèâ óêàçàòåëåé
+		double** temp = new double* [this->row];    // массив указателей
 		for (int i = 0; i < this->row; i++) {   //
-			temp[i] = new double[second->col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+			temp[i] = new double[second->col];     // инициализация указателей
 		}
 
 		for (int i = 0; i < this->row; i++)
@@ -423,17 +420,17 @@ void Matrix::operator*=(Matrix* second) {
 		this->col = second->col;
 		delete[] this->matrix_array;
 
-		this->matrix_array = new double* [this->row];    // ìàññèâ óêàçàòåëåé
+		this->matrix_array = new double* [this->row];    // массив указателей
 		for (int i = 0; i < this->row; i++) {   //
-			this->matrix_array[i] = new double[this->col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+			this->matrix_array[i] = new double[this->col];     // инициализация указателей
 
 		}
 
-		for (int i = 0; i < this->row; i++)   //ñòðîêè ìàññèâà
+		for (int i = 0; i < this->row; i++)   //строки массива
 		{
-			for (int j = 0; j < this->col; j++)   //ñòîëáöû ìàññèâà
+			for (int j = 0; j < this->col; j++)   //столбцы массива
 			{
-				this->matrix_array[i][j] = temp[i][j];  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+				this->matrix_array[i][j] = temp[i][j];  //заполняем текущую ячейку
 				if (abs(this->matrix_array[i][j]) < 2.22045e-13)
 					this->matrix_array[i][j] = 0;
 
@@ -446,15 +443,15 @@ void Matrix::operator*=(Matrix* second) {
 
 
 
-/*Âû÷èòàíèå ìàòðèöû */
+/*Вычитание матрицы */
 
 void Matrix::minus(Matrix* m2, Matrix* m3) {
 
-	for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+	for (int i = 0; i < row; i++)   //строки массива
 	{
-		for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+		for (int j = 0; j < col; j++)   //столбцы массива
 		{
-			m3->matrix_array[i][j] = matrix_array[i][j] - m2->matrix_array[i][j];  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+			m3->matrix_array[i][j] = matrix_array[i][j] - m2->matrix_array[i][j];  //заполняем текущую ячейку
 
 		}
 	}
@@ -464,7 +461,7 @@ void Matrix::minus(Matrix* m2, Matrix* m3) {
 
 
 
-/*Óìíîæåíèå ìàòðèöû*/
+/*Умножение матрицы*/
 
 void Matrix::times(Matrix* m2, Matrix* m3) {
 	
@@ -494,30 +491,30 @@ void Matrix::times(Matrix* m2, Matrix* m3) {
 }
 
 
-/*Óìíîæåíèå ìàòðèöû íà ñêàëÿð */
+/*Умножение матрицы на скаляр */
 
 void Matrix::times_scal(double scal, Matrix* m3) {
 	
-	for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+	for (int i = 0; i < row; i++)   //строки массива
 	{
-		for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+		for (int j = 0; j < col; j++)   //столбцы массива
 		{
-			m3->matrix_array[i][j] = matrix_array[i][j] * scal;  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+			m3->matrix_array[i][j] = matrix_array[i][j] * scal;  //заполняем текущую ячейку
 
 		}
 	}
 }
 
 
-/*Äåëåíèå ìàòðèöû íà ñêàëÿð */
+/*Деление матрицы на скаляр */
 
 void Matrix::divide_scal(double scal, Matrix* m3) {
 	
-	for (int i = 0; i < row; i++)   //ñòðîêè ìàññèâà
+	for (int i = 0; i < row; i++)   //строки массива
 	{
-		for (int j = 0; j < col; j++)   //ñòîëáöû ìàññèâà
+		for (int j = 0; j < col; j++)   //столбцы массива
 		{
-			m3->matrix_array[i][j] = matrix_array[i][j] / scal;  //çàïîëíÿåì òåêóùóþ ÿ÷åéêó
+			m3->matrix_array[i][j] = matrix_array[i][j] / scal;  //заполняем текущую ячейку
 
 		}
 	}
@@ -527,7 +524,7 @@ void Matrix::divide_scal(double scal, Matrix* m3) {
 
 
 
-/* Âîçâåäåíèå â ñòåïåíü */
+/* Возведение в степень */
 void Matrix::pow(int n, Matrix* m3) {
 		
 		this->times(this, m3);
@@ -543,7 +540,7 @@ void Matrix::pow(int n, Matrix* m3) {
 
 
 
-/*Ñðàâíåíèå ìàòðèö */
+/*Сравнение матриц */
 
 bool Matrix::areEqual(Matrix *m2) {
 	
@@ -583,11 +580,11 @@ double Matrix::findNorm() {
 		return temp;
 	}
 	else
-		cout << "Ïîèñê ñëåäà ìàòðèöû äîñòóïåí òîëüêî äëÿ êâàäðàòíûõ ìàòðèö\n";
+		cout << "Поиск следа матрицы доступен только для квадратных матриц\n";
 
 }
 
-/*ïîèñê îïðåäåëèòåëÿ*/
+/*поиск определителя*/
 
 double Matrix::findDet() {
 	double Det;
@@ -599,25 +596,25 @@ double Matrix::findDet() {
 		}
 		else {
 
-			double** temp = new double* [this->row];    // ìàññèâ óêàçàòåëåé
+			double** temp = new double* [this->row];    // массив указателей
 			for (int i = 0; i < this->row; i++) {   //
-				temp[i] = new double[this->row];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+				temp[i] = new double[this->row];     // инициализация указателей
 			}
 
 			for (int i = 0; i < this->row; i++)
 				for (int j = 0; j < this->row; j++)
 					temp[i][j] = this->matrix_array[i][j];
 
-			//ïðèâåäåíèå ìàòðèöû ê âåðõíåòðåóãîëüíîìó âèäó
+			//приведение матрицы к верхнетреугольному виду
 			for (int step = 0; step < this->row - 1; step++)
 				for (int row_count = step + 1; row_count < this->row; row_count++)
 				{
-					double coeff = -temp[row_count][step] / temp[step][step]; //ìåòîä Ãàóññà
+					double coeff = -temp[row_count][step] / temp[step][step]; //метод Гаусса
 					for (int col_count = step; col_count < this->row; col_count++)
 						temp[row_count][col_count] += temp[step][col_count] * coeff;
 				}
 
-			//Ðàññ÷èòàòü îïðåäåëèòåëü êàê ïðîèçâåäåíèå ýëåìåíòîâ ãëàâíîé äèàãîíàëè
+			//Рассчитать определитель как произведение элементов главной диагонали
 			Det = 1;
 			for (int i = 0; i < this->row; i++)
 				Det *= temp[i][i];
@@ -626,7 +623,7 @@ double Matrix::findDet() {
 	}
 }
 
-/*íàõîæäåíèå îáðàòíîé ìàòðèöû*/
+/*нахождение обратной матрицы*/
 
 void Matrix::invertMatrix(Matrix* m3) {
 	
@@ -637,14 +634,14 @@ void Matrix::invertMatrix(Matrix* m3) {
 		if (det != 0)
 		{
 
-			double** complement_matrix; //ìàòðèöà àëãåáðàè÷åñêèõ äîïîëíåíèé
+			double** complement_matrix; //матрица алгебраических дополнений
 
-			complement_matrix = new double* [this->row];    // ìàññèâ óêàçàòåëåé
+			complement_matrix = new double* [this->row];    // массив указателей
 			for (int i = 0; i < this->row; i++) {   //
-				complement_matrix[i] = new double[this->col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+				complement_matrix[i] = new double[this->col];     // инициализация указателей
 			}
 
-			//çàïîëíÿåì ìàòðèöó àëãåáðàè÷åñêèõ äîïîëíåíèé îïðåäåëèòåëÿìè ìèíîðîâ
+			//заполняем матрицу алгебраических дополнений определителями миноров
 			for (int i = 0; i < row; i++)
 			{
 				for (int j = 0; j < col; j++)
@@ -670,7 +667,7 @@ void Matrix::invertMatrix(Matrix* m3) {
 				}
 			}
 
-			//òðàíñïîíèðóåì ìàòðèöó àëãåáðàè÷åñêèõ äîïîëíåíèé è äåëèì åå íà îïðåäåëèòåëü èñõîäíîé
+			//транспонируем матрицу алгебраических дополнений и делим ее на определитель исходной
 			m3->transMatrix(m3);
 			m3->divide_scal(det, m3);
 		}
@@ -681,7 +678,7 @@ void Matrix::invertMatrix(Matrix* m3) {
 
 
 
-/* Òðàíñïîíèðîâàíèå ìàòðèöû */
+/* Транспонирование матрицы */
 
 Matrix Matrix::transMatrix(Matrix *m3) {
 
@@ -695,15 +692,15 @@ Matrix Matrix::transMatrix(Matrix *m3) {
 
 }
 
-/*Ïðîâåðêà òèïîâ ìàòðèöû*/
+/*Проверка типов матрицы*/
 
 
 bool* Matrix::checkType() {
 	
 	
-	double** zero_array = new double* [row];    // ìàññèâ óêàçàòåëåé
+	double** zero_array = new double* [row];    // массив указателей
 	for (int i = 0; i < row; i++) {   //
-		zero_array[i] = new double[col];     // èíèöèàëèçàöèÿ óêàçàòåëåé
+		zero_array[i] = new double[col];     // инициализация указателей
 
 	}
 	for (int i = 0; i < row; i++)
@@ -715,20 +712,20 @@ bool* Matrix::checkType() {
 	}
 	Matrix* temp = new Matrix(row, col, zero_array);
 
-	bool square = false; // êâàäðàòíàÿ
-	bool diagonal = true; // äèàãîíàëüíàÿ
-	bool empty = true; // íóëåâàÿ 
-	bool identity = true; //åäèíè÷íàÿ
-	bool symmetrical = false; // ñèììåòðè÷åñêàÿ 
-	bool upperTriangle = true; // âåðõíÿÿ òðåóãîëüíàÿ
-	bool lowerTriangle = true; // íèæíÿÿ òðåóãîëüíàÿ
+	bool square = false; // квадратная
+	bool diagonal = true; // диагональная
+	bool empty = true; // нулевая 
+	bool identity = true; //единичная
+	bool symmetrical = false; // симметрическая 
+	bool upperTriangle = true; // верхняя треугольная
+	bool lowerTriangle = true; // нижняя треугольная
 	bool ordinary = true;
 
-	//ïðîâåðêà íà êâàäðàòíóþ ìàòðèöó
+	//проверка на квадратную матрицу
 	if (row == col)
 		square = true;
 
-	//ïðîâåðêà íà äèàãîíàëüíóþ ìàòðèöó, åñëè íàõîäèì íåíóëåâîé ýëåìåíò âíå ãëàâíîé äèàãîíàëè - âûõîäèì èç öèêëà
+	//проверка на диагональную матрицу, если находим ненулевой элемент вне главной диагонали - выходим из цикла
 	if (square == true) {
 		for (int i = 0; i < row; i++)
 		{
@@ -747,7 +744,7 @@ bool* Matrix::checkType() {
 		}
 
 	}
-	//åñëè ìàòðèöà íå êâàäðàòíàÿ - ñðàçó äåëàåì âûâîä, ÷òî îíà íå äèàãîíàëüíàÿ, åäèíè÷íàÿ, âåðõíå- è íèæíåòðåóãîëüíàÿ
+	//если матрица не квадратная - сразу делаем вывод, что она не диагональная, единичная, верхне- и нижнетреугольная
 	else {
 		diagonal = false;
 		identity = false;
@@ -770,7 +767,7 @@ bool* Matrix::checkType() {
 		}
 
 	}
-	//åñëè ìàòðèöà äèàãîíàëüíàÿ - äîïîëíèòåëüíàÿ ïðîâåðêà íà íóëåâóþ ìàòðèöó
+	//если матрица диагональная - дополнительная проверка на нулевую матрицу
 	if (diagonal == true) {
 		
 		for (int i = 0; i < row; i++)
@@ -792,7 +789,7 @@ bool* Matrix::checkType() {
 	else {
 		identity = false;
 	}
-	// ïðîâåðêà íà åäèíè÷íóþ ìàòðèöó
+	// проверка на единичную матрицу
 	if (diagonal == true) {
 
 		for (int i = 0; i < row; i++)
@@ -811,14 +808,14 @@ bool* Matrix::checkType() {
 		}
 	}
 
-	//ïðîâåðêà íà ñèììåòðè÷åñêóþ ìàòðèöó
+	//проверка на симметрическую матрицу
 	if (square) {
 		this->transMatrix(temp);
-		if (this->areEqual(temp)) //åñëè èñõîäíàÿ è òðàíñïîíèðîâàííàÿ ìàòðèöû ðàâíû
+		if (this->areEqual(temp)) //если исходная и транспонированная матрицы равны
 			symmetrical = true;
 	}
 	
-	// ïðîâåðêà íà íèæíþþ òðåóãîëüíóþ ìàòðèöó 
+	// проверка на нижнюю треугольную матрицу 
 
 	if (square == true && diagonal == false) {
 
@@ -839,7 +836,7 @@ bool* Matrix::checkType() {
 
 	}
 
-	// ïðîâåðêà íà âåðõíþþ òðåóãîëüíóþ ìàòðèöó 
+	// проверка на верхнюю треугольную матрицу 
 
 	if (square == true && diagonal==false) {
 
